@@ -6,7 +6,7 @@ Cough is designed to be simple, efficient, and web-focused, making it the ideal 
 
 ## TODO: 
 
-- **Self-Hosted**: Cough will compile itself, showcasing its capability to generate code for its own compiler.
+- **Self-Hosted**: Cough will compile itself, showcasing its capability to generate code for its own compiler. See #cough.cough for details (when it's there).
 - **Compile to HTML**: The primary output of Cough code will be valid HTML, making it perfect for integrating front-end development.
 - **Performance-Oriented**: Compiled Cough code will be optimized for fast execution in web environments and less overhead.
 
@@ -26,3 +26,7 @@ The project is not yet functional, as it is in ***active development***. However
 2. **Use cough.html as the compiler**:
 
    Select which directory you want to compile and use your own custom logic to decide when to compile the code.
+
+## Made By:
+
+Marco Gomez - @Dr-Gomez
