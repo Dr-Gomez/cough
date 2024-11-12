@@ -2,6 +2,9 @@ const sourceCode = `
 if x == 42 {
     return "hello"
 }
+
+// Hello my name is shamamamamama
+
 `;
 
 enum TokenType {
@@ -119,6 +122,19 @@ function getNextToken(
     return { token, newIndex: index };
   }
 
+  if (char === "/" && input[index + 1] === "/") {
+    index += 2;
+    const start = index;
+    while (index < input.length && input[index] !== "\n") {
+      index++;
+    }
+    const token: Token = {
+      type: TokenType.COMMENT,
+      text: input.slice(start, index),
+    };
+    return { token, newIndex: index };
+  }
+
   if (isOperator(char)) {
     const token: Token = {
       type: TokenType.OPERATOR,
@@ -134,19 +150,6 @@ function getNextToken(
       text: char,
     };
     index++;
-    return { token, newIndex: index };
-  }
-
-  if (char === "/" && input[index + 1] === "/") {
-    index += 2;
-    const start = index;
-    while (index < input.length && input[index] !== "\n") {
-      index++;
-    }
-    const token: Token = {
-      type: TokenType.COMMENT,
-      text: input.slice(start, index),
-    };
     return { token, newIndex: index };
   }
 
