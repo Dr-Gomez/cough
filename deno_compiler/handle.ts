@@ -16,6 +16,7 @@ export enum TokenType {
   OPERATOR,
   PUNCTUATOR,
   COMMENT,
+  ERROR,
 }
 
 export interface Token {
@@ -23,20 +24,36 @@ export interface Token {
   value: string;
 }
 
-function handleEOF(source: string, index: number) {
+export interface TokenWrapper {
+  token: Token | null;
+  index: number;
+}
+
+function handleEOF(source: string, index: number): TokenWrapper {
   if (index >= source.length) {
     const token: Token = {
       type: TokenType.EOF,
       value: "",
     };
 
-    return token;
+    return { token: token, index: index };
   }
+
+  return { token: null, index: index };
 }
 
-function handleNamespace(source: string, index: number): void | Token {
+function handleWhitespace(source: string, index: number): TokenWrapper {
+  while (/\s/.test(source[index]) === true) {
+    index++;
+  }
+
+  return { token: null, index: index };
+}
+
+function handleNamespace(source: string, index: number): TokenWrapper {
   if (isAlpha(source[index])) {
     const start = index;
+
     while (
       index < source.length &&
       (isAlpha(source[index]) || isDigit(source[index]))
@@ -51,19 +68,35 @@ function handleNamespace(source: string, index: number): void | Token {
       value: namespace,
     };
 
-    return token;
+    return { token: token, index: index };
   }
+
+  return { token: null, index: index };
 }
 
-export default function handleToken(source: string, index: number): Token {
-  let token: Token;
-  let borrower: void | Token;
+export default function handleToken(
+  source: string,
+  index: number
+): TokenWrapper {
+  let borrower: TokenWrapper | null;
 
-  borrower = handleNamespace(source, index);
-  if (borrower) {
-    token = borrower;
-    borrower = undefined;
+  borrower = handleEOF(source, index);
+  if (borrower?.token !== null) {
+    return borrower;
   }
 
-  return token!;
+  borrower = handleWhitespace(source, index);
+  index = borrower.index;
+
+  borrower = handleNamespace(source, index);
+  if (borrower?.token !== null) {
+    return borrower;
+  }
+
+  const errToken: TokenWrapper = {
+    token: { type: TokenType.ERROR, value: "" },
+    index,
+  };
+
+  return errToken;
 }

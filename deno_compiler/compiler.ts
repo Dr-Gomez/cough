@@ -149,20 +149,35 @@
 // });
 
 import handleToken from "./handle.ts";
-import { Token, TokenType } from "./handle.ts";
+import { Token, TokenWrapper, TokenType } from "./handle.ts";
 
-const sourceCode = `
-hello
-`;
+const sourceCode = `  aaaa`;
 
-let index = 0;
+let tokenQueue: Array<Token> = [];
+let infoLog: Array<string> = [];
 
-let token: Token = {
-  type: TokenType.SOF,
-  value: "",
+let jumpToken: TokenWrapper = {
+  token: { type: TokenType.SOF, value: "" },
+  index: 0,
 };
 
+tokenQueue.push(jumpToken.token!);
+infoLog.push(
+  `${new Date().toUTCString()}: pushed token {${
+    TokenType[jumpToken.token!.type]
+  }} with a value of [${jumpToken.token!.value}] `
+);
+
 do {
-  token = handleToken(sourceCode, index);
-  index++;
-} while (token.type != TokenType.EOF);
+  jumpToken = handleToken(sourceCode, jumpToken.index);
+  tokenQueue.push(jumpToken.token!);
+  infoLog.push(
+    `${new Date().toUTCString()}: pushed token {${
+      TokenType[jumpToken.token!.type]
+    }} with a value of [${jumpToken.token!.value}] `
+  );
+  jumpToken.index++;
+} while (jumpToken.token?.type != TokenType.EOF);
+
+console.log(infoLog);
+console.log(tokenQueue);
