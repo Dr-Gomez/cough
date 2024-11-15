@@ -29,6 +29,14 @@ export interface TokenWrapper {
   index: number;
 }
 
+function handleWhitespace(source: string, index: number): TokenWrapper {
+  while (/\s/.test(source[index]) === true) {
+    index++;
+  }
+
+  return { token: null, index: index };
+}
+
 function handleEOF(source: string, index: number): TokenWrapper {
   if (index >= source.length) {
     const token: Token = {
@@ -37,14 +45,6 @@ function handleEOF(source: string, index: number): TokenWrapper {
     };
 
     return { token: token, index: index };
-  }
-
-  return { token: null, index: index };
-}
-
-function handleWhitespace(source: string, index: number): TokenWrapper {
-  while (/\s/.test(source[index]) === true) {
-    index++;
   }
 
   return { token: null, index: index };
@@ -74,22 +74,29 @@ function handleNamespace(source: string, index: number): TokenWrapper {
   return { token: null, index: index };
 }
 
+function checkBorrower(borrower: TokenWrapper) {
+  if (borrower.token) {
+    return true;
+  }
+  return false;
+}
+
 export default function handleToken(
   source: string,
   index: number
 ): TokenWrapper {
   let borrower: TokenWrapper | null;
 
-  borrower = handleEOF(source, index);
-  if (borrower?.token !== null) {
-    return borrower;
-  }
-
   borrower = handleWhitespace(source, index);
   index = borrower.index;
 
+  borrower = handleEOF(source, index);
+  if (checkBorrower(borrower)) {
+    return borrower;
+  }
+
   borrower = handleNamespace(source, index);
-  if (borrower?.token !== null) {
+  if (checkBorrower(borrower)) {
     return borrower;
   }
 

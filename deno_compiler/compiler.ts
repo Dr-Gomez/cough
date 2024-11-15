@@ -152,10 +152,9 @@ import handleToken from "./handle.ts";
 import { Token, TokenWrapper, TokenType } from "./handle.ts";
 import log from "./log.ts";
 
-const sourceCode = `  aaaa`;
+const sourceCode = ` if aaaa`;
 
 let tokenQueue: Array<Token> = [];
-let logArr: Array<string> = [];
 
 let jumpToken: TokenWrapper = {
   token: { type: TokenType.SOF, value: "" },
@@ -164,27 +163,13 @@ let jumpToken: TokenWrapper = {
 
 tokenQueue.push(jumpToken.token!);
 
-logArr.push(
-  log(
-    "pushed token",
-    TokenType[jumpToken.token!.type],
-    "with value",
-    jumpToken.token!.value
-  )
-);
+log.logToken(TokenType[jumpToken.token!.type], jumpToken.token!.value);
 
 do {
   jumpToken = handleToken(sourceCode, jumpToken.index);
   tokenQueue.push(jumpToken.token!);
-  logArr.push(
-    log(
-      "pushed token",
-      TokenType[jumpToken.token!.type],
-      "with value",
-      jumpToken.token!.value
-    )
-  );
+  log.logToken(TokenType[jumpToken.token!.type], jumpToken.token!.value);
   jumpToken.index++;
 } while (jumpToken.token?.type != TokenType.EOF);
 
-console.log(logArr);
+console.log(log.showLogs());
