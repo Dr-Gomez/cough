@@ -8,6 +8,10 @@ class log {
   }
 
   public logToken(header: string, payload: string) {
+    if (payload === "") {
+      payload = "(null)";
+    }
+
     this.logArr.push(
       `${this.timer()}: Created token [header: ${header}] with value [payload: ${payload}].`
     );

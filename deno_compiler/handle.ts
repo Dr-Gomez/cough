@@ -30,10 +30,9 @@ export interface TokenWrapper {
 }
 
 function handleWhitespace(source: string, index: number): TokenWrapper {
-  while (/\s/.test(source[index]) === true) {
+  while (/\s/.test(source[index])) {
     index++;
   }
-
   return { token: null, index: index };
 }
 
@@ -43,42 +42,130 @@ function handleEOF(source: string, index: number): TokenWrapper {
       type: TokenType.EOF,
       value: "",
     };
-
     return { token: token, index: index };
   }
-
   return { token: null, index: index };
 }
 
 function handleNamespace(source: string, index: number): TokenWrapper {
   if (isAlpha(source[index])) {
     const start = index;
-
     while (
       index < source.length &&
       (isAlpha(source[index]) || isDigit(source[index]))
     ) {
       index++;
     }
-
-    const namespace = source.slice(start, index);
-
+    const value = source.slice(start, index);
     const token: Token = {
-      type: isKeyword(namespace) ? TokenType.KEYWORD : TokenType.IDENTIFIER,
-      value: namespace,
+      type: isKeyword(value) ? TokenType.KEYWORD : TokenType.IDENTIFIER,
+      value,
     };
-
-    return { token: token, index: index };
+    return { token, index };
   }
+  return { token: null, index };
+}
 
-  return { token: null, index: index };
+function handleNumber(source: string, index: number): TokenWrapper {
+  const start = index;
+  while (index < source.length && isDigit(source[index])) {
+    index++;
+  }
+  if (source[index] === "." && isDigit(source[index + 1])) {
+    index++;
+    while (index < source.length && isDigit(source[index])) {
+      index++;
+    }
+  }
+  const value = source.slice(start, index);
+  const token: Token = {
+    type: TokenType.NUMBER,
+    value,
+  };
+  return { token, index };
+}
+
+function handleString(source: string, index: number): TokenWrapper {
+  if (source[index] === '"') {
+    const start = index + 1;
+    index++;
+    while (index < source.length && source[index] !== '"') {
+      index++;
+    }
+    const value = source.slice(start, index);
+    const token: Token = {
+      type: TokenType.STRING,
+      value,
+    };
+    index++;
+    return { token, index };
+  }
+  return { token: null, index };
+}
+
+function handleOperator(source: string, index: number): TokenWrapper {
+  if (isOperator(source[index])) {
+    const value = source[index];
+    const token: Token = {
+      type: TokenType.OPERATOR,
+      value,
+    };
+    return { token, index: index + 1 };
+  }
+  return { token: null, index };
+}
+
+function handlePunctuator(source: string, index: number): TokenWrapper {
+  if (isPunctuator(source[index])) {
+    const value = source[index];
+    const token: Token = {
+      type: TokenType.PUNCTUATOR,
+      value,
+    };
+    return { token, index: index + 1 };
+  }
+  return { token: null, index };
+}
+
+function handleComment(source: string, index: number): TokenWrapper {
+  if (source[index] === "/") {
+    const start: number = index;
+
+    if (source[index + 1] === "/") {
+      index += 2;
+      while (index < source.length && source[index] !== "\n") {
+        index++;
+      }
+
+      const value = source.slice(start, index);
+      const token: Token = {
+        type: TokenType.COMMENT,
+        value,
+      };
+      return { token, index };
+    } else if (source[index + 1] === "*") {
+      index += 2;
+      let start = index;
+      while (
+        index < source.length &&
+        !(source[index] === "*" && source[index + 1] === "/")
+      ) {
+        index++;
+      }
+      const value = source.slice(start, index);
+      const token: Token = {
+        type: TokenType.COMMENT,
+        value,
+      };
+      index += 2;
+      return { token, index };
+    }
+  }
+  return { token: null, index };
 }
 
 function checkBorrower(borrower: TokenWrapper) {
-  if (borrower.token) {
-    return true;
-  }
-  return false;
+  return borrower.token !== null;
 }
 
 export default function handleToken(
@@ -95,7 +182,32 @@ export default function handleToken(
     return borrower;
   }
 
+  borrower = handleComment(source, index);
+  if (checkBorrower(borrower)) {
+    return borrower;
+  }
+
   borrower = handleNamespace(source, index);
+  if (checkBorrower(borrower)) {
+    return borrower;
+  }
+
+  borrower = handleNumber(source, index);
+  if (checkBorrower(borrower)) {
+    return borrower;
+  }
+
+  borrower = handleString(source, index);
+  if (checkBorrower(borrower)) {
+    return borrower;
+  }
+
+  borrower = handleOperator(source, index);
+  if (checkBorrower(borrower)) {
+    return borrower;
+  }
+
+  borrower = handlePunctuator(source, index);
   if (checkBorrower(borrower)) {
     return borrower;
   }
