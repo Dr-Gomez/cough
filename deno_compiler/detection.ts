@@ -1,13 +1,4 @@
-const keywords: string[] = [
-  "if",
-  "else",
-  "elif",
-  "for",
-  "while",
-  "end",
-  "until",
-  "return",
-];
+const keywords: string[] = ["if", "else", "elif", "for", "while", "end", "return"];
 
 function isKeyword(word: string): boolean {
   return keywords.includes(word);
@@ -18,7 +9,7 @@ function isAlpha(char: string): boolean {
 }
 
 function isDigit(char: string): boolean {
-  return /^\d$/.test(char);
+  return /^\d$/.test(char) && char !== " ";
 }
 
 function isOperator(char: string): boolean {

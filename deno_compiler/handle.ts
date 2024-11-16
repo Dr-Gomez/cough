@@ -1,10 +1,4 @@
-import {
-  isKeyword,
-  isAlpha,
-  isDigit,
-  isOperator,
-  isPunctuator,
-} from "./detection.ts";
+import { isKeyword, isAlpha, isDigit, isOperator, isPunctuator } from "./detection.ts";
 
 export enum TokenType {
   EOF,
@@ -50,10 +44,7 @@ function handleEOF(source: string, index: number): TokenWrapper {
 function handleNamespace(source: string, index: number): TokenWrapper {
   if (isAlpha(source[index])) {
     const start = index;
-    while (
-      index < source.length &&
-      (isAlpha(source[index]) || isDigit(source[index]))
-    ) {
+    while (index < source.length && (isAlpha(source[index]) || isDigit(source[index]))) {
       index++;
     }
     const value = source.slice(start, index);
@@ -80,7 +71,7 @@ function handleNumber(source: string, index: number): TokenWrapper {
   const value = source.slice(start, index);
   const token: Token = {
     type: TokenType.NUMBER,
-    value,
+    value: value,
   };
   return { token, index };
 }
@@ -95,7 +86,7 @@ function handleString(source: string, index: number): TokenWrapper {
     const value = source.slice(start, index);
     const token: Token = {
       type: TokenType.STRING,
-      value,
+      value: value,
     };
     index++;
     return { token, index };
@@ -146,10 +137,7 @@ function handleComment(source: string, index: number): TokenWrapper {
     } else if (source[index + 1] === "*") {
       index += 2;
       let start = index;
-      while (
-        index < source.length &&
-        !(source[index] === "*" && source[index + 1] === "/")
-      ) {
+      while (index < source.length && !(source[index] === "*" && source[index + 1] === "/")) {
         index++;
       }
       const value = source.slice(start, index);
@@ -168,48 +156,19 @@ function checkBorrower(borrower: TokenWrapper) {
   return borrower.token !== null;
 }
 
-export default function handleToken(
-  source: string,
-  index: number
-): TokenWrapper {
-  let borrower: TokenWrapper | null;
+const instrQueue: Array<Function> = [handleWhitespace, handleEOF, handleComment, handleNamespace, handleNumber, handleString, handleOperator, handlePunctuator];
 
-  borrower = handleWhitespace(source, index);
+export default function handleToken(source: string, index: number): TokenWrapper {
+  let borrower: TokenWrapper;
+
+  borrower = instrQueue[0](source, index);
   index = borrower.index;
 
-  borrower = handleEOF(source, index);
-  if (checkBorrower(borrower)) {
-    return borrower;
-  }
-
-  borrower = handleComment(source, index);
-  if (checkBorrower(borrower)) {
-    return borrower;
-  }
-
-  borrower = handleNamespace(source, index);
-  if (checkBorrower(borrower)) {
-    return borrower;
-  }
-
-  borrower = handleNumber(source, index);
-  if (checkBorrower(borrower)) {
-    return borrower;
-  }
-
-  borrower = handleString(source, index);
-  if (checkBorrower(borrower)) {
-    return borrower;
-  }
-
-  borrower = handleOperator(source, index);
-  if (checkBorrower(borrower)) {
-    return borrower;
-  }
-
-  borrower = handlePunctuator(source, index);
-  if (checkBorrower(borrower)) {
-    return borrower;
+  for (let i = 1; i < instrQueue.length; i++) {
+    borrower = instrQueue[i](source, index);
+    if (checkBorrower(borrower)) {
+      return borrower;
+    }
   }
 
   const errToken: TokenWrapper = {

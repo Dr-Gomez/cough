@@ -12,18 +12,14 @@ class log {
       payload = "(null)";
     }
 
-    this.logArr.push(
-      `${this.timer()}: Created token [header: ${header}] with value [payload: ${payload}].`
-    );
+    this.logArr.push(`${this.timer()}: Created token [header: ${header}] with value [payload: ${payload}].`);
   }
 
   logAppend(parent: Token | "main" | null, token: Token) {
     if (parent === null) {
       parent = "main";
     }
-    this.logArr.push(
-      `${this.timer()}: Appended token [${token}] to [parent: ${parent}]`
-    );
+    this.logArr.push(`${this.timer()}: Appended token [${token}] to [parent: ${parent}]`);
   }
 
   public showLogs(): Array<string> {
