@@ -9,7 +9,8 @@ function isAlpha(char: string): boolean {
 }
 
 function isDigit(char: string): boolean {
-  return /^\d$/.test(char) && char !== " ";
+  console.log(char, !isNaN(parseInt(char)));
+  return !isNaN(parseInt(char));
 }
 
 function isOperator(char: string): boolean {
