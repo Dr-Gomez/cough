@@ -27,6 +27,7 @@ function handleWhitespace(source: string, index: number): TokenWrapper {
   while (/\s/.test(source[index])) {
     index++;
   }
+
   return { token: null, index: index };
 }
 
@@ -69,11 +70,16 @@ function handleNumber(source: string, index: number): TokenWrapper {
     }
   }
   const value = source.slice(start, index);
-  const token: Token = {
-    type: TokenType.NUMBER,
-    value: value,
-  };
-  return { token, index };
+  if (value) {
+    const token: Token = {
+      type: TokenType.NUMBER,
+      value: value,
+    };
+
+    return { token, index };
+  }
+
+  return { token: null, index };
 }
 
 function handleString(source: string, index: number): TokenWrapper {
@@ -156,7 +162,7 @@ function checkBorrower(borrower: TokenWrapper) {
   return borrower.token !== null;
 }
 
-const instrQueue: Array<Function> = [handleWhitespace, handleEOF, handleComment, handleString, handlePunctuator, handleOperator, handleNamespace, handleNumber];
+const instrQueue: Array<Function> = [handleWhitespace, handleEOF, handleComment, handleString, handlePunctuator, handleOperator, handleNumber, handleNamespace];
 
 export default function handleToken(source: string, index: number): TokenWrapper {
   let borrower: TokenWrapper;

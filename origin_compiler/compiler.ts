@@ -16,6 +16,10 @@ if (x > y) {
     y -= 1;
     console.log("y is less than x");
 }
+/*
+This is a multiline comment
+*/
+
 `;
 
 let tokenQueue: Array<Token> = [];
