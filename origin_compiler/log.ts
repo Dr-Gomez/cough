@@ -1,6 +1,7 @@
 import { Token } from "./handle.ts";
 
 class log {
+  private separator = "------------------------------------------";
   private logArr: Array<string> = [];
 
   private timer(): string {
@@ -26,13 +27,12 @@ class log {
     for (let i = 0; i < this.logArr.length; i++) {
       console.log(this.logArr[i]);
     }
+    console.log(this.separator);
   }
 
   constructor() {
     this.logArr.push(`${this.timer()}: LOG STARTED`);
-
-    const separator = "------------------------------------------";
-    this.logArr.push(separator);
+    this.logArr.push(this.separator);
   }
 }
 
