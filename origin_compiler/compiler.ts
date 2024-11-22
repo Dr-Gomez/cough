@@ -4,7 +4,7 @@ import log from "./log.ts";
 
 const sourceCode = `
 
-array<int> hello = [ba]a
+array@int hello = [1, 5, 2, 6]
 
 `;
 

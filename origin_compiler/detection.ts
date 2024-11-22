@@ -17,7 +17,7 @@ function isOperator(char: string): boolean {
 }
 
 function isPunctuator(char: string): boolean {
-  return [",", ".", ";", ":", "(", ")", "{", "}", "[", "]"].includes(char);
+  return [",", ".", ";", ":", "(", ")", "{", "}", "[", "]", "@"].includes(char);
 }
 
 export { isKeyword, isAlpha, isDigit, isOperator, isPunctuator };
