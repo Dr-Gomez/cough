@@ -105,7 +105,7 @@ function handleOperator(source: string, index: number): TokenWrapper {
     const value = source[index];
     const token: Token = {
       type: TokenType.OPERATOR,
-      value,
+      value: value,
     };
     return { token, index: index + 1 };
   }
@@ -117,7 +117,7 @@ function handlePunctuator(source: string, index: number): TokenWrapper {
     const value = source[index];
     const token: Token = {
       type: TokenType.PUNCTUATOR,
-      value,
+      value: value,
     };
     return { token, index: index + 1 };
   }
@@ -137,7 +137,7 @@ function handleComment(source: string, index: number): TokenWrapper {
       const value = source.slice(start, index);
       const token: Token = {
         type: TokenType.COMMENT,
-        value,
+        value: value,
       };
       return { token, index };
     } else if (source[index + 1] === "*") {
@@ -146,10 +146,11 @@ function handleComment(source: string, index: number): TokenWrapper {
       while (index < source.length && !(source[index] === "*" && source[index + 1] === "/")) {
         index++;
       }
-      const value = source.slice(start, index);
+      let value = source.slice(start, index);
+      value = value.replaceAll(/(\r\n|\n|\r)/gm, "");
       const token: Token = {
         type: TokenType.COMMENT,
-        value,
+        value: value,
       };
       index += 2;
       return { token, index };

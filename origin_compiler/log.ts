@@ -22,13 +22,17 @@ class log {
     this.logArr.push(`${this.timer()}: Appended token [${token}] to [parent: ${parent}]`);
   }
 
-  public showLogs(): Array<string> {
-    return this.logArr;
+  public showLogs(): void {
+    for (let i = 0; i < this.logArr.length; i++) {
+      console.log(this.logArr[i]);
+    }
   }
 
   constructor() {
     this.logArr.push(`${this.timer()}: LOG STARTED`);
-    this.logArr.push("------------------------------------------");
+
+    const separator = "------------------------------------------";
+    this.logArr.push(separator);
   }
 }
 
