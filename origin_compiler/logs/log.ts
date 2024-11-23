@@ -1,4 +1,4 @@
-import { Token } from "./handle.ts";
+import { Token } from "../handle.ts";
 
 class log {
   private separator = "------------------------------------------";

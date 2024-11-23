@@ -1,10 +1,10 @@
 import handleToken from "./handle.ts";
 import { Token, TokenWrapper, TokenType } from "./handle.ts";
-import log from "./log.ts";
+import log from "./logs/log.ts";
 
 const sourceCode = `
 
-int@array hello = [1, 5, 2, 6]
+int@array hello = [1, 5, 2, 6];
 
 `;
 
