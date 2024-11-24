@@ -1,4 +1,4 @@
-import { isKeyword, isAlpha, isDigit, isOperator, isPunctuator } from "./detection.ts";
+import { isKeyword, isAlpha, isDigit, isOperator, isPunctuator } from "./helper/detection.ts";
 
 export enum TokenType {
   EOF,
