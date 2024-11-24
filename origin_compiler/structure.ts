@@ -1,3 +1,5 @@
+import { Token, TokenType } from "./handle.ts";
+
 // Program Block
 
 interface RootNode {
@@ -33,7 +35,7 @@ interface typeNode extends RootNode {
 // Binary Ops
 
 interface BinaryOperatorNode extends RootNode {
-  value: "add" | "subtract" | "multiply" | "devide";
+  value: "add" | "subtract" | "multiply" | "divide";
 }
 
 interface BinaryExpressionNode extends RootNode {
@@ -123,3 +125,5 @@ interface ClassNode extends RootNode {
   methods: MethodNode[];
   staticMethods: StaticMethodNode[];
 }
+
+export default function handleNode() {}

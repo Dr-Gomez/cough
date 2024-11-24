@@ -159,7 +159,7 @@ function handleComment(source: string, index: number): TokenWrapper {
   return { token: null, index };
 }
 
-function checkBorrower(borrower: TokenWrapper) {
+function checkBorrower(borrower: TokenWrapper): boolean {
   return borrower.token !== null;
 }
 
