@@ -1,9 +1,10 @@
-import { isKeyword, isAlpha, isDigit, isOperator, isPunctuator } from "./helper/detection.ts";
+import { isKeyword, isAlpha, isDigit, isOperator, isPunctuator, isType } from "./helper/detection.ts";
 
 export enum TokenType {
   EOF,
   SOF,
   IDENTIFIER,
+  TYPE,
   NUMBER,
   STRING,
   KEYWORD,
@@ -49,9 +50,19 @@ function handleNamespace(source: string, index: number): TokenWrapper {
       index++;
     }
     const value = source.slice(start, index);
+
+    let type: TokenType;
+
+    if (isKeyword(value)) {
+      type = TokenType.KEYWORD;
+    } else if (isType(value)) {
+      type = TokenType.TYPE;
+    } else {
+      type = TokenType.IDENTIFIER;
+    }
     const token: Token = {
-      type: isKeyword(value) ? TokenType.KEYWORD : TokenType.IDENTIFIER,
-      value,
+      type: type,
+      value: value,
     };
     return { token, index };
   }
