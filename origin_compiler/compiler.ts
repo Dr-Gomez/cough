@@ -37,4 +37,5 @@ do {
   log.logToken(TokenType[jumpToken.token!.type], jumpToken.token!.value);
 } while (jumpToken.token?.type != TokenType.EOF);
 
+log.separateLogs();
 log.showLogs();

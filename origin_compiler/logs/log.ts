@@ -27,12 +27,15 @@ class log {
     for (let i = 0; i < this.logArr.length; i++) {
       console.log(this.logArr[i]);
     }
-    console.log(this.separator);
+  }
+
+  public separateLogs(): void {
+    this.logArr.push(this.separator);
   }
 
   constructor() {
     this.logArr.push(`${this.timer()}: LOG STARTED`);
-    this.logArr.push(this.separator);
+    this.separateLogs();
   }
 }
 
