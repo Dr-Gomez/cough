@@ -4,7 +4,19 @@ import log from "./logs/log.ts";
 
 const sourceCode = `
 
-int@array hello = [1, 5, 2, 6];
+char@array alphabet = ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z"];
+int@array numbers = [16, 1, 19, 20];
+
+int i = 0;
+loop {
+  i++;
+
+  print(alphabet[numbers[i]]);
+
+  if(i == numbers.length){
+    break;
+  }
+}
 
 `;
 
