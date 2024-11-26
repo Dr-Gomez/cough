@@ -1,4 +1,4 @@
-import { Token, TokenType } from "./handle.ts";
+import { Token, TokenType } from "../lexer/handle.ts";
 
 // Program Block
 
