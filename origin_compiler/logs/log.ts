@@ -1,4 +1,4 @@
-import { Token } from "../lexer/handle.ts";
+import { Token } from "../lexer/lexer.ts";
 
 class log {
   private separator = "------------------------------------------";
