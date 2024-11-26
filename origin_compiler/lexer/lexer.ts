@@ -1,4 +1,4 @@
-import { isKeyword, isAlpha, isDigit, isOperator, isPunctuator, isType } from "./detection.ts";
+import { isKeyword, isAlpha, isDigit, isBinaryOperator, isUnaryOperator, isPunctuator, isType } from "./detection.ts";
 
 export enum TokenType {
   EOF,
@@ -8,7 +8,8 @@ export enum TokenType {
   NUMBER,
   STRING,
   KEYWORD,
-  OPERATOR,
+  BIN_OPERATOR,
+  UNA_OPERATOR,
   PUNCTUATOR,
   COMMENT,
   ERROR,
@@ -112,10 +113,22 @@ function handleString(source: string, index: number): TokenWrapper {
 }
 
 function handleOperator(source: string, index: number): TokenWrapper {
-  if (isOperator(source[index])) {
+  const unaryOperator = source[index] + source[index + 1];
+
+  if (isUnaryOperator(unaryOperator)) {
+    const value = unaryOperator;
+    const token: Token = {
+      type: TokenType.UNA_OPERATOR,
+      value: value,
+    };
+
+    return { token, index: index + 2 };
+  }
+
+  if (isBinaryOperator(source[index])) {
     const value = source[index];
     const token: Token = {
-      type: TokenType.OPERATOR,
+      type: TokenType.BIN_OPERATOR,
       value: value,
     };
     return { token, index: index + 1 };

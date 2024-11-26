@@ -14,16 +14,20 @@ function isAlpha(char: string): boolean {
   return /^[a-zA-Z_]$/.test(char);
 }
 
-function isDigit(char: string): boolean {
-  return /^[0-9]$/.test(char);
+function isDigit(num: string): boolean {
+  return /^[0-9]$/.test(num);
 }
 
-function isOperator(char: string): boolean {
-  return ["+", "-", "*", "/", "=", "<", ">"].includes(char);
+function isUnaryOperator(op: string): boolean {
+  return ["++", "--", "~~", "+~", "-~"].includes(op);
+}
+
+function isBinaryOperator(op: string): boolean {
+  return ["+", "-", "*", "/", "=", "<", ">"].includes(op);
 }
 
 function isPunctuator(char: string): boolean {
   return [",", ".", ";", ":", "(", ")", "{", "}", "[", "]", "@"].includes(char);
 }
 
-export { isKeyword, isType, isAlpha, isDigit, isOperator, isPunctuator };
+export { isKeyword, isType, isAlpha, isDigit, isUnaryOperator, isBinaryOperator, isPunctuator };
