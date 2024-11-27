@@ -1,4 +1,4 @@
-const keywords: string[] = ["if", "else", "loop", "fn", "return"];
+const keywords: string[] = ["if", "else", "loop", "break", "fn", "return"];
 
 function isKeyword(word: string): boolean {
   return keywords.includes(word);
@@ -18,16 +18,26 @@ function isDigit(num: string): boolean {
   return /^[0-9]$/.test(num);
 }
 
-function isUnaryOperator(op: string): boolean {
-  return ["++", "--", "~~", "+~", "-~"].includes(op);
+const operatorChars: string[] = ["+", "-", "*", "/", "=", "<", ">", "~"];
+
+function isOperatorChar(char: string): boolean {
+  return operatorChars.includes(char);
 }
 
+const unaryOperators: string[] = ["++", "--", "~~", "+~", "-~"];
+
+function isUnaryOperator(op: string): boolean {
+  return unaryOperators.includes(op);
+}
+
+const binaryOperators: string[] = ["+", "-", "*", "/", "=", "<", ">"];
+
 function isBinaryOperator(op: string): boolean {
-  return ["+", "-", "*", "/", "=", "<", ">"].includes(op);
+  return binaryOperators.includes(op);
 }
 
 function isPunctuator(char: string): boolean {
   return [",", ".", ";", ":", "(", ")", "{", "}", "[", "]", "@"].includes(char);
 }
 
-export { isKeyword, isType, isAlpha, isDigit, isUnaryOperator, isBinaryOperator, isPunctuator };
+export { isKeyword, isType, isAlpha, isDigit, isOperatorChar, isUnaryOperator, isBinaryOperator, isPunctuator };
