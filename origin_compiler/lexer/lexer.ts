@@ -1,4 +1,4 @@
-import { isKeyword, isAlpha, isDigit, isBinaryOperator, isUnaryOperator, isPunctuator, isType } from "./detection.ts";
+import { isKeyword, isAlpha, isDigit, isOperatorChar, isBinaryOperator, isUnaryOperator, isPunctuator, isType } from "./detection.ts";
 
 export enum TokenType {
   EOF,
@@ -113,26 +113,31 @@ function handleString(source: string, index: number): TokenWrapper {
 }
 
 function handleOperator(source: string, index: number): TokenWrapper {
-  const unaryOperator = source[index] + source[index + 1];
+  const start = index;
+  while (index < source.length && isOperatorChar(source[index])) {
+    index++;
+  }
 
-  if (isUnaryOperator(unaryOperator)) {
-    const value = unaryOperator;
+  const value = source.slice(start, index);
+
+  if (isUnaryOperator(value)) {
     const token: Token = {
       type: TokenType.UNA_OPERATOR,
       value: value,
     };
-
-    return { token, index: index + 2 };
+    index++;
+    return { token, index: index };
   }
 
-  if (isBinaryOperator(source[index])) {
-    const value = source[index];
+  if (isBinaryOperator(value)) {
     const token: Token = {
       type: TokenType.BIN_OPERATOR,
       value: value,
     };
-    return { token, index: index + 1 };
+    index++;
+    return { token, index: index };
   }
+
   return { token: null, index };
 }
 
@@ -143,7 +148,8 @@ function handlePunctuator(source: string, index: number): TokenWrapper {
       type: TokenType.PUNCTUATOR,
       value: value,
     };
-    return { token, index: index + 1 };
+    index++;
+    return { token, index: index };
   }
   return { token: null, index };
 }
