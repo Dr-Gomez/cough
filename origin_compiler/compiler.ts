@@ -33,9 +33,16 @@ log.logToken(TokenType[jumpToken.token!.type], jumpToken.token!.value);
 
 do {
   jumpToken = handleToken(sourceCode, jumpToken.index);
+  if (jumpToken.token?.type == TokenType.ERROR) {
+    log.logError(sourceCode, jumpToken.index);
+    break;
+  }
   tokenQueue.push(jumpToken.token!);
   log.logToken(TokenType[jumpToken.token!.type], jumpToken.token!.value);
 } while (jumpToken.token?.type != TokenType.EOF);
 
-log.separateLogs();
+if (jumpToken.token?.type != TokenType.ERROR) {
+  log.logSuccess();
+}
+
 log.showLogs();
