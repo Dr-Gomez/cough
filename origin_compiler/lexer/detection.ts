@@ -30,7 +30,7 @@ function isUnaryOperator(op: string): boolean {
   return unaryOperators.includes(op);
 }
 
-const binaryOperators: string[] = ["+", "-", "*", "/", "=", "==", "===", "<", "<=", "<==", ">", ">=", ">=="];
+const binaryOperators: string[] = ["+", "-", "*", "/", "=", "==", "<", "<=", ">", ">="];
 
 function isBinaryOperator(op: string): boolean {
   return binaryOperators.includes(op);
