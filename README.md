@@ -9,6 +9,7 @@ Cough is designed to be simple, efficient, and web-focused, making it the ideal 
 - **Self-Hosted**: Cough will compile itself, showcasing its capability to generate code for its own compiler. See #cough.cough for details (when it's there).
 - **Compile to HTML**: The primary output of Cough code will be valid HTML, making it perfect for integrating front-end development.
 - **Performance-Oriented**: Compiled Cough code will be optimized for fast execution in web environments and less overhead.
+- **Self-Updatable**: Cough should use a timer system to test out multiple alternatives for each logical step (e.g. multiple types of for loop when iterating over an array) of the project, making it self-optimizable for builds of your project.
 
 ## Vision
 
