@@ -67,14 +67,13 @@ class BinaryOperationNode extends Node {
 // Handler Functions
 
 interface NodeWrapper {
-  node: Node | null,
+  node: Node | null;
   index: number;
 }
 
-function handleStringLiteralNode(tokens: Token[], index) {
-  if (tokens[index].type === TokenType.STRING){
-    
-    return new StringLiteralNode(tokens[index].value)
+function handleStringLiteralNode(tokens: Token[], index: number) {
+  if (tokens[index].type === TokenType.STRING) {
+    return new StringLiteralNode(tokens[index].value);
   }
 }
 
@@ -83,5 +82,5 @@ function checkBorrower(borrower: NodeWrapper): boolean {
 }
 
 const instrQueue: Array<Function> = [
-  handleStringLiteralNode
-]
+  handleStringLiteralNode,
+];
