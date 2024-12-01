@@ -13,7 +13,7 @@ loop {
 
   print(alphabet[numbers[i]]);
 
-  if(i == numbers.length){
+  if(i == length@numbers){
     break;
   }
 }

@@ -37,7 +37,7 @@ function isBinaryOperator(op: string): boolean {
 }
 
 function isPunctuator(char: string): boolean {
-  return [",", ".", ";", ":", "(", ")", "{", "}", "[", "]", "@"].includes(char);
+  return [",", ";", ":", "(", ")", "{", "}", "[", "]", "@"].includes(char);
 }
 
 export { isKeyword, isType, isAlpha, isDigit, isOperatorChar, isUnaryOperator, isBinaryOperator, isPunctuator };
