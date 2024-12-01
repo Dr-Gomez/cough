@@ -1,4 +1,13 @@
-import { isKeyword, isAlpha, isDigit, isOperatorChar, isBinaryOperator, isUnaryOperator, isPunctuator, isType } from "./detection.ts";
+import {
+  isAlpha,
+  isBinaryOperator,
+  isDigit,
+  isKeyword,
+  isOperatorChar,
+  isPunctuator,
+  isType,
+  isUnaryOperator,
+} from "./detection.ts";
 
 export enum TokenType {
   EOF,
@@ -47,7 +56,10 @@ function handleEOF(source: string, index: number): TokenWrapper {
 function handleNamespace(source: string, index: number): TokenWrapper {
   if (isAlpha(source[index])) {
     const start = index;
-    while (index < source.length && (isAlpha(source[index]) || isDigit(source[index]))) {
+    while (
+      index < source.length &&
+      (isAlpha(source[index]) || isDigit(source[index]))
+    ) {
       index++;
     }
     const value = source.slice(start, index);
@@ -173,7 +185,10 @@ function handleComment(source: string, index: number): TokenWrapper {
     } else if (source[index + 1] === "*") {
       index += 2;
       let start = index;
-      while (index < source.length && !(source[index] === "*" && source[index + 1] === "/")) {
+      while (
+        index < source.length &&
+        !(source[index] === "*" && source[index + 1] === "/")
+      ) {
         index++;
       }
       let value = source.slice(start, index);
@@ -193,9 +208,21 @@ function checkBorrower(borrower: TokenWrapper): boolean {
   return borrower.token !== null;
 }
 
-const instrQueue: Array<Function> = [handleWhitespace, handleEOF, handleString, handleComment, handlePunctuator, handleOperator, handleNumber, handleNamespace];
+const instrQueue: Array<Function> = [
+  handleWhitespace,
+  handleEOF,
+  handleString,
+  handleComment,
+  handlePunctuator,
+  handleOperator,
+  handleNumber,
+  handleNamespace,
+];
 
-export default function handleToken(source: string, index: number): TokenWrapper {
+export default function handleToken(
+  source: string,
+  index: number,
+): TokenWrapper {
   let borrower: TokenWrapper;
 
   borrower = instrQueue[0](source, index);

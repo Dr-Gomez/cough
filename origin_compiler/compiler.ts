@@ -1,5 +1,5 @@
 import handleToken from "./lexer/lexer.ts";
-import { Token, TokenWrapper, TokenType } from "./lexer/lexer.ts";
+import { Token, TokenType, TokenWrapper } from "./lexer/lexer.ts";
 import log from "./logs/log.ts";
 
 const sourceCode = `

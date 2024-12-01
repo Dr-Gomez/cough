@@ -15,14 +15,18 @@ class log {
       payload = "(null)";
     }
 
-    this.logArr.push(`${this.timer()}: Created token [header: "${header}"] with value [payload: "${payload}"].`);
+    this.logArr.push(
+      `${this.timer()}: Created token [header: "${header}"] with value [payload: "${payload}"].`,
+    );
   }
 
   logAppend(parent: Token | "main" | null, token: Token) {
     if (parent === null) {
       parent = "main";
     }
-    this.logArr.push(`${this.timer()}: Appended token ["${token}"] to [parent: "${parent}:]`);
+    this.logArr.push(
+      `${this.timer()}: Appended token ["${token}"] to [parent: "${parent}:]`,
+    );
   }
 
   public logError(text: string, index: number) {
@@ -48,7 +52,11 @@ class log {
     this.separateLogs();
     this.logArr.push(`${this.timer()}: LOG ENDED`);
     this.separateLogs();
-    this.logArr.push(`${this.timer()}: ERROR: error in character "${text[index]}" found at [line: ${errPos.line}, pos: ${errPos.char}] of your code`);
+    this.logArr.push(
+      `${this.timer()}: ERROR: error in character "${
+        text[index]
+      }" found at [line: ${errPos.line}, pos: ${errPos.char}] of your code`,
+    );
   }
 
   public logSuccess() {
@@ -67,7 +75,9 @@ class log {
     this.separateLogs();
     this.logArr.push(`${this.timer()}: LOG ENDED`);
     this.separateLogs();
-    this.logArr.push(`${this.timer()}: SUCCESS: Code was successfully transpiled in ${result}. EUREKA!`);
+    this.logArr.push(
+      `${this.timer()}: SUCCESS: Code was successfully transpiled in ${result}. EUREKA!`,
+    );
   }
 
   public showLogs(): void {

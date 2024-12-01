@@ -30,7 +30,18 @@ function isUnaryOperator(op: string): boolean {
   return unaryOperators.includes(op);
 }
 
-const binaryOperators: string[] = ["+", "-", "*", "/", "=", "==", "<", "<=", ">", ">="];
+const binaryOperators: string[] = [
+  "+",
+  "-",
+  "*",
+  "/",
+  "=",
+  "==",
+  "<",
+  "<=",
+  ">",
+  ">=",
+];
 
 function isBinaryOperator(op: string): boolean {
   return binaryOperators.includes(op);
@@ -40,4 +51,13 @@ function isPunctuator(char: string): boolean {
   return [",", ";", ":", "(", ")", "{", "}", "[", "]", "@"].includes(char);
 }
 
-export { isKeyword, isType, isAlpha, isDigit, isOperatorChar, isUnaryOperator, isBinaryOperator, isPunctuator };
+export {
+  isAlpha,
+  isBinaryOperator,
+  isDigit,
+  isKeyword,
+  isOperatorChar,
+  isPunctuator,
+  isType,
+  isUnaryOperator,
+};
