@@ -64,4 +64,24 @@ class BinaryOperationNode extends Node {
   }
 }
 
-export default function handleNode() {}
+// Handler Functions
+
+interface NodeWrapper {
+  node: Node | null,
+  index: number;
+}
+
+function handleStringLiteralNode(tokens: Token[], index) {
+  if (tokens[index].type === TokenType.STRING){
+    
+    return new StringLiteralNode(tokens[index].value)
+  }
+}
+
+function checkBorrower(borrower: NodeWrapper): boolean {
+  return borrower.node !== null;
+}
+
+const instrQueue: Array<Function> = [
+  handleStringLiteralNode
+]
