@@ -193,7 +193,7 @@ function checkBorrower(borrower: TokenWrapper): boolean {
   return borrower.token !== null;
 }
 
-const instrQueue: Array<Function> = [handleWhitespace, handleEOF, handleComment, handleString, handlePunctuator, handleOperator, handleNumber, handleNamespace];
+const instrQueue: Array<Function> = [handleWhitespace, handleEOF, handleString, handleComment, handlePunctuator, handleOperator, handleNumber, handleNamespace];
 
 export default function handleToken(source: string, index: number): TokenWrapper {
   let borrower: TokenWrapper;
