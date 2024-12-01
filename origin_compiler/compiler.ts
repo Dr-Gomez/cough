@@ -1,5 +1,6 @@
 import handleToken from "./lexer/lexer.ts";
 import { Token, TokenType, TokenWrapper } from "./lexer/lexer.ts";
+import { CodeBlockNode } from "./parser/parser.ts";
 import log from "./logs/log.ts";
 
 const sourceCode = `
@@ -42,7 +43,7 @@ do {
 } while (jumpToken.token?.type != TokenType.EOF);
 
 if (jumpToken.token?.type != TokenType.ERROR) {
-  log.logSuccess();
+  log.logSuccess("tokenized");
 }
 
 log.showLogs();

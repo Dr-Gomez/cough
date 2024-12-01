@@ -59,7 +59,7 @@ class log {
     );
   }
 
-  public logSuccess() {
+  public logSuccess(successType: string) {
     const endTime = performance.now();
 
     const deltaTime = endTime - this.startTime;
@@ -76,8 +76,9 @@ class log {
     this.logArr.push(`${this.timer()}: LOG ENDED`);
     this.separateLogs();
     this.logArr.push(
-      `${this.timer()}: SUCCESS: Code was successfully transpiled in ${result}. EUREKA!`,
+      `${this.timer()}: SUCCESS: Code was successfully ${successType} in ${result}. EUREKA!`,
     );
+    this.separateLogs();
   }
 
   public showLogs(): void {
