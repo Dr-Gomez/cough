@@ -10,6 +10,7 @@ Cough is designed to be simple, efficient, and web-focused, making it the ideal 
 - **Compile to HTML**: The primary output of Cough code will be valid HTML, making it perfect for integrating front-end development.
 - **Performance-Oriented**: Compiled Cough code will be optimized for fast execution in web environments and less overhead.
 - **Self-Updatable**: Cough should use a timer system to test out multiple alternatives for each logical step (e.g. multiple types of for loop when iterating over an array) of the project, making it self-optimizable for builds of your project.
+- **Parser**: Only the lexer is complete. Now finishing the parser is required.
 
 ## Vision
 
