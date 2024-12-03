@@ -85,13 +85,24 @@ interface NodeWrapper {
 
 function handleNumberLiteralNode(tokens: Token[], index: number) {
   if (tokens[index].type === TokenType.NUMBER) {
-    return new NumberLiteralNode(Number.parseFloat(tokens[index].value));
+    const num: number = Number.parseFloat(tokens[index].value)
+    return new NumberLiteralNode(num);
   }
 }
 
 function handleStringLiteralNode(tokens: Token[], index: number) {
   if (tokens[index].type === TokenType.STRING) {
     return new StringLiteralNode(tokens[index].value);
+  }
+}
+
+function handleBoolLiteralNode(tokens: Token[], index: number) {
+  if (tokens[index].type === TokenType.BOOL) {
+    if(tokens[index].value === "true") {
+      return new BoolLiteralNode(true)
+    } else {
+      return new BoolLiteralNode(false)
+    }
   }
 }
 
@@ -104,6 +115,7 @@ function checkBorrower(borrower: NodeWrapper): boolean {
 const instrQueue: Array<Function> = [
   handleNumberLiteralNode,
   handleStringLiteralNode,
+  handleBoolLiteralNode
 ];
 
 export default function handleNode(
