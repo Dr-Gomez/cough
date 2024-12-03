@@ -16,6 +16,18 @@ export class CodeBlockNode extends Node {
   }
 }
 
+class FunctionNode extends Node {
+  type = "Function";
+  parameters: Node[];
+  block: CodeBlockNode;
+
+  constructor(parameters: Node[], block: CodeBlockNode) {
+    super();
+    this.parameters = parameters;
+    this.block = block;
+  }
+}
+
 // Literal Nodes
 
 class NumberLiteralNode extends Node {
@@ -71,6 +83,12 @@ interface NodeWrapper {
   index: number;
 }
 
+function handleNumberLiteralNode(tokens: Token[], index: number) {
+  if (tokens[index].type === TokenType.NUMBER) {
+    return new NumberLiteralNode(Number.parseFloat(tokens[index].value));
+  }
+}
+
 function handleStringLiteralNode(tokens: Token[], index: number) {
   if (tokens[index].type === TokenType.STRING) {
     return new StringLiteralNode(tokens[index].value);
@@ -81,6 +99,26 @@ function checkBorrower(borrower: NodeWrapper): boolean {
   return borrower.node !== null;
 }
 
+// Handler functions need to go from highest scope to slowest
+
 const instrQueue: Array<Function> = [
+  handleNumberLiteralNode,
   handleStringLiteralNode,
 ];
+
+export default function handleNode(
+  tokens: Array<Token>,
+  index: number,
+) {
+  let borrower: NodeWrapper;
+
+  borrower = instrQueue[0](tokens, index);
+  index = borrower.index;
+
+  for (let i = 1; i < instrQueue.length; i++) {
+    borrower = instrQueue[i](tokens, index);
+    if (checkBorrower(borrower)) {
+      return borrower;
+    }
+  }
+}

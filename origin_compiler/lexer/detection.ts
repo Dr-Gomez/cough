@@ -10,6 +10,12 @@ function isType(word: string): boolean {
   return types.includes(word);
 }
 
+const bools: string[] = ["true", "false"];
+
+function isBool(key: string): boolean {
+  return bools.includes(key);
+}
+
 function isAlpha(char: string): boolean {
   return /^[a-zA-Z_]$/.test(char);
 }
@@ -54,6 +60,7 @@ function isPunctuator(char: string): boolean {
 export {
   isAlpha,
   isBinaryOperator,
+  isBool,
   isDigit,
   isKeyword,
   isOperatorChar,

@@ -1,6 +1,7 @@
 import {
   isAlpha,
   isBinaryOperator,
+  isBool,
   isDigit,
   isKeyword,
   isOperatorChar,
@@ -16,6 +17,7 @@ export enum TokenType {
   TYPE,
   NUMBER,
   STRING,
+  BOOL,
   KEYWORD,
   BIN_OPERATOR,
   UNA_OPERATOR,
@@ -70,9 +72,12 @@ function handleNamespace(source: string, index: number): TokenWrapper {
       type = TokenType.KEYWORD;
     } else if (isType(value)) {
       type = TokenType.TYPE;
+    } else if (isBool(value)) {
+      type = TokenType.BOOL;
     } else {
       type = TokenType.IDENTIFIER;
     }
+
     const token: Token = {
       type: type,
       value: value,
