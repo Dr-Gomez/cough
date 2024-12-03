@@ -83,6 +83,12 @@ interface NodeWrapper {
   index: number;
 }
 
+function handleStringLiteralNode(tokens: Token[], index: number) {
+  if (tokens[index].type === TokenType.STRING) {
+    return new StringLiteralNode(tokens[index].value);
+  }
+}
+
 function handleNumberLiteralNode(tokens: Token[], index: number) {
   if (tokens[index].type === TokenType.NUMBER) {
     const num: number = Number.parseFloat(tokens[index].value)
@@ -90,11 +96,6 @@ function handleNumberLiteralNode(tokens: Token[], index: number) {
   }
 }
 
-function handleStringLiteralNode(tokens: Token[], index: number) {
-  if (tokens[index].type === TokenType.STRING) {
-    return new StringLiteralNode(tokens[index].value);
-  }
-}
 
 function handleBoolLiteralNode(tokens: Token[], index: number) {
   if (tokens[index].type === TokenType.BOOL) {
@@ -113,8 +114,8 @@ function checkBorrower(borrower: NodeWrapper): boolean {
 // Handler functions need to go from highest scope to slowest
 
 const instrQueue: Array<Function> = [
-  handleNumberLiteralNode,
   handleStringLiteralNode,
+  handleNumberLiteralNode,
   handleBoolLiteralNode
 ];
 
