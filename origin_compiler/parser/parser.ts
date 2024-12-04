@@ -85,26 +85,40 @@ interface NodeWrapper {
 
 function handleStringLiteralNode(tokens: Token[], index: number) {
   if (tokens[index].type === TokenType.STRING) {
-    return new StringLiteralNode(tokens[index].value);
+    return {node: new StringLiteralNode(tokens[index].value), index: index + 1};;
   }
+
+  return { node: null, index };
 }
 
 function handleNumberLiteralNode(tokens: Token[], index: number) {
   if (tokens[index].type === TokenType.NUMBER) {
     const num: number = Number.parseFloat(tokens[index].value)
-    return new NumberLiteralNode(num);
+    return {node: new NumberLiteralNode(num), index: index + 1};
   }
+
+  return { node: null, index };
 }
 
 
 function handleBoolLiteralNode(tokens: Token[], index: number) {
   if (tokens[index].type === TokenType.BOOL) {
     if(tokens[index].value === "true") {
-      return new BoolLiteralNode(true)
+      return {node: new BoolLiteralNode(true), index: index + 1}
     } else {
-      return new BoolLiteralNode(false)
+      return {node: new BoolLiteralNode(true), index: index + 1}
     }
   }
+
+  return { node: null, index };
+}
+
+function handleVariableNode(tokens: Token[], index: number) {
+  if (tokens[index].type === TokenType.IDENTIFIER) {
+    return {} 
+  }
+
+  return { node: null, index };
 }
 
 function checkBorrower(borrower: NodeWrapper): boolean {
@@ -116,7 +130,8 @@ function checkBorrower(borrower: NodeWrapper): boolean {
 const instrQueue: Array<Function> = [
   handleStringLiteralNode,
   handleNumberLiteralNode,
-  handleBoolLiteralNode
+  handleBoolLiteralNode,
+  handleVariableNode
 ];
 
 export default function handleNode(
