@@ -79,13 +79,6 @@ class log {
       `${this.timer()}: SUCCESS: Code was successfully ${successType} in ${result}.`,
     );
     this.separateLogs();
-    this.logArr.push(
-      `${this.timer()}: Programming is pressing the buttons in the correct order until the computer does some thing,`
-    )
-    this.logArr.push(
-      `                                                                                            Marco Gomez (Father), 04/11/2024`
-    )
-    this.separateLogs();
   }
 
   public showLogs(): void {
