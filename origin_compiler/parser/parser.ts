@@ -4,30 +4,6 @@ abstract class Node {
   abstract type: string;
 }
 
-// Control Flow Nodes
-
-export class CodeBlockNode extends Node {
-  type = "CodeBlock";
-  statements: Node[];
-
-  constructor(statements: Node[]) {
-    super();
-    this.statements = statements;
-  }
-}
-
-class FunctionNode extends Node {
-  type = "Function";
-  parameters: Node[];
-  block: CodeBlockNode;
-
-  constructor(parameters: Node[], block: CodeBlockNode) {
-    super();
-    this.parameters = parameters;
-    this.block = block;
-  }
-}
-
 // Literal Nodes
 
 class NumberLiteralNode extends Node {
@@ -76,6 +52,43 @@ class BinaryOperationNode extends Node {
   }
 }
 
+// Variable Nodes
+
+class VariableNode extends Node {
+  type = "Variable";
+  name: string;
+
+  constructor(name: string) {
+    super();
+    this.name = name;
+  }
+}
+
+
+// Control Flow Nodes
+
+export class CodeBlockNode extends Node {
+  type = "CodeBlock";
+  statements: Node[];
+
+  constructor(statements: Node[]) {
+    super();
+    this.statements = statements;
+  }
+}
+
+class MethodNode extends Node {
+  type = "Method";
+  parameters: Node[];
+  block: CodeBlockNode;
+
+  constructor(parameters: Node[], block: CodeBlockNode) {
+    super();
+    this.parameters = parameters;
+    this.block = block;
+  }
+}
+
 // Handler Functions
 
 interface NodeWrapper {
@@ -115,7 +128,7 @@ function handleBoolLiteralNode(tokens: Token[], index: number) {
 
 function handleVariableNode(tokens: Token[], index: number) {
   if (tokens[index].type === TokenType.IDENTIFIER) {
-    return {} 
+    return {node: new VariableNode(tokens[index].value), index: index + 1} 
   }
 
   return { node: null, index };
