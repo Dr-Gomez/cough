@@ -64,7 +64,6 @@ class VariableNode extends Node {
   }
 }
 
-
 // Control Flow Nodes
 
 export class CodeBlockNode extends Node {
@@ -98,7 +97,10 @@ interface NodeWrapper {
 
 function handleStringLiteralNode(tokens: Token[], index: number) {
   if (tokens[index].type === TokenType.STRING) {
-    return {node: new StringLiteralNode(tokens[index].value), index: index + 1};;
+    return {
+      node: new StringLiteralNode(tokens[index].value),
+      index: index + 1,
+    };
   }
 
   return { node: null, index };
@@ -106,20 +108,19 @@ function handleStringLiteralNode(tokens: Token[], index: number) {
 
 function handleNumberLiteralNode(tokens: Token[], index: number) {
   if (tokens[index].type === TokenType.NUMBER) {
-    const num: number = Number.parseFloat(tokens[index].value)
-    return {node: new NumberLiteralNode(num), index: index + 1};
+    const num: number = Number.parseFloat(tokens[index].value);
+    return { node: new NumberLiteralNode(num), index: index + 1 };
   }
 
   return { node: null, index };
 }
 
-
 function handleBoolLiteralNode(tokens: Token[], index: number) {
   if (tokens[index].type === TokenType.BOOL) {
-    if(tokens[index].value === "true") {
-      return {node: new BoolLiteralNode(true), index: index + 1}
+    if (tokens[index].value === "true") {
+      return { node: new BoolLiteralNode(true), index: index + 1 };
     } else {
-      return {node: new BoolLiteralNode(true), index: index + 1}
+      return { node: new BoolLiteralNode(true), index: index + 1 };
     }
   }
 
@@ -128,7 +129,7 @@ function handleBoolLiteralNode(tokens: Token[], index: number) {
 
 function handleVariableNode(tokens: Token[], index: number) {
   if (tokens[index].type === TokenType.IDENTIFIER) {
-    return {node: new VariableNode(tokens[index].value), index: index + 1} 
+    return { node: new VariableNode(tokens[index].value), index: index + 1 };
   }
 
   return { node: null, index };
@@ -144,7 +145,7 @@ const instrQueue: Array<Function> = [
   handleStringLiteralNode,
   handleNumberLiteralNode,
   handleBoolLiteralNode,
-  handleVariableNode
+  handleVariableNode,
 ];
 
 export default function handleNode(

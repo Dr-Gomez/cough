@@ -1,4 +1,4 @@
-import handleToken from "./lexer/lexer.ts";
+import handleTokens from "./lexer/lexer.ts";
 import { Token, TokenType, TokenWrapper } from "./lexer/lexer.ts";
 import { CodeBlockNode } from "./parser/parser.ts";
 import log from "./logs/log.ts";
@@ -22,29 +22,6 @@ loop {
 
 `;
 
-let tokenQueue: Array<Token> = [];
-
-let jumpToken: TokenWrapper = {
-  token: { type: TokenType.SOF, value: "" },
-  index: 0,
-};
-
-tokenQueue.push(jumpToken.token!);
-
-log.logToken(TokenType[jumpToken.token!.type], jumpToken.token!.value);
-
-do {
-  jumpToken = handleToken(sourceCode, jumpToken.index);
-  if (jumpToken.token?.type == TokenType.ERROR) {
-    log.logError(sourceCode, jumpToken.index);
-    break;
-  }
-  tokenQueue.push(jumpToken.token!);
-  log.logToken(TokenType[jumpToken.token!.type], jumpToken.token!.value);
-} while (jumpToken.token?.type != TokenType.EOF);
-
-if (jumpToken.token?.type != TokenType.ERROR) {
-  log.logSuccess("tokenized");
-}
+let TokenQueue: Token[] = handleTokens(sourceCode);
 
 log.showLogs();

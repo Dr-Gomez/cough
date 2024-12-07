@@ -1,3 +1,5 @@
+import log from "../logs/log.ts";
+
 import {
   isAlpha,
   isBinaryOperator,
@@ -224,7 +226,7 @@ const instrQueue: Array<Function> = [
   handleNamespace,
 ];
 
-export default function handleToken(
+function handleToken(
   source: string,
   index: number,
 ): TokenWrapper {
@@ -246,4 +248,38 @@ export default function handleToken(
   };
 
   return errToken;
+}
+
+export default function handleTokens(
+  source: string,
+) {
+  let tokenQueue: Array<Token> = [];
+
+  let jumpToken: TokenWrapper = {
+    token: { type: TokenType.SOF, value: "" },
+    index: 0,
+  };
+
+  log.logToken(TokenType[jumpToken.token!.type], jumpToken.token!.value);
+
+  let index = 0;
+
+  while (jumpToken.token?.type !== TokenType.EOF) {
+    jumpToken = handleToken(source, index);
+
+    if (jumpToken.token?.type == TokenType.ERROR) {
+      log.logError(source, index);
+      break;
+    }
+
+    tokenQueue.push(jumpToken.token!);
+    index = jumpToken.index;
+    log.logToken(TokenType[jumpToken.token!.type], jumpToken.token!.value);
+  }
+
+  if (jumpToken.token?.type != TokenType.ERROR) {
+    log.logSuccess("tokenized");
+  }
+
+  return tokenQueue;
 }
