@@ -17,7 +17,7 @@ class ErrorNode extends Node {
 // Literal Nodes
 
 class NumberLiteralNode extends Node {
-  type = "Number";
+  type = "NumberLiteral";
   value: number;
 
   constructor(value: number) {
@@ -27,7 +27,7 @@ class NumberLiteralNode extends Node {
 }
 
 class StringLiteralNode extends Node {
-  type = "String";
+  type = "StringLiteral";
   value: string;
 
   constructor(value: string) {
@@ -37,7 +37,7 @@ class StringLiteralNode extends Node {
 }
 
 class BoolLiteralNode extends Node {
-  type = "Boolean";
+  type = "BoolLiteral";
   value: boolean;
 
   constructor(value: boolean) {

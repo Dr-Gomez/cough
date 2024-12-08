@@ -41,7 +41,7 @@ class log {
 
   public logAppend(childNode: string, parentNode: string | null) {
     if (parentNode === null) {
-      parentNode = "main";
+      parentNode = "Main";
     }
     this.logArr.push(
       `${this.timer()}: Appended node ["${childNode}"] to [parent: "${parentNode}"]`,
