@@ -119,6 +119,7 @@ function handleStringLiteralNode(tokens: Token[], index: number) {
 function handleNumberLiteralNode(tokens: Token[], index: number) {
   if (tokens[index].type === TokenType.NUMBER) {
     const num: number = Number.parseFloat(tokens[index].value);
+
     return { node: new NumberLiteralNode(num), index: index + 1 };
   }
 
@@ -179,12 +180,12 @@ function handleNode(
 }
 
 export default function handleNodes(tokens: Array<Token>) {
-  let index = 0;
-  let jumpNode: NodeWrapper
+  let index = 1; // Starts from one because first token is always SOF
+  let jumpNode: NodeWrapper = { node: null, index: index }
 
   let nodeQueue: Array<Node> = []
 
-  while (index < tokens.length) {
+  while (tokens[index].type !== TokenType.EOF) {
     jumpNode = handleNode(tokens, index);
     
     if (jumpNode.node?.type == "Error") {
@@ -194,10 +195,11 @@ export default function handleNodes(tokens: Array<Token>) {
 
     nodeQueue.push(jumpNode.node!)
     index = jumpNode.index
+    log.logAppend(jumpNode.node!.type, null)
   }
 
-  if (jumpNode!.node?.type !== "Error") {
-    log.logSuccess("nodes generated", "NODE");
+  if (jumpNode.node?.type !== "Error") {
+    log.logSuccess("nodenized", "NODE");
   }
 
   return new CodeBlockNode(nodeQueue)
