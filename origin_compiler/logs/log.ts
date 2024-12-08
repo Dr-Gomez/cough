@@ -70,20 +70,20 @@ class log {
 
     this.endLog("TOKEN");
     this.logArr.push(
-      `${this.timer()}: ERROR: Error in character "${
+      `${this.timer()}: ERROR: cannot recognize character "${
         text[index]
       }" found at [line: ${errPos.line}, pos: ${errPos.char}] of your code`,
     );
   }
 
-  public logNodeError(token: string, index: number) {
+  public logNodeError(error: string) {
     this.endLog("NODE");
     this.logArr.push(
-      `${this.timer()}: ERROR: Error in token "${token}", tokenNum: "${index}"`,
+      `${this.timer()}: ERROR: "${error}"`,
     );
   }
 
-  public logSuccess(successType: string, type: string) {
+  public logSuccess(type: string) {
     const endTime = performance.now();
 
     const deltaTime = endTime - this.startTime;
@@ -98,7 +98,7 @@ class log {
 
     this.endLog(type);
     this.logArr.push(
-      `${this.timer()}: SUCCESS: Code was successfully ${successType} in ${result}.`,
+      `${this.timer()}: SUCCESS: Code was successfully ${type + "NIZED"} in ${result}.`,
     );
     this.separateLogs();
   }

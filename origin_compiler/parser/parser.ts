@@ -8,9 +8,11 @@ abstract class Node {
 // Error Node
 class ErrorNode extends Node {
   type = "Error";
+  msg: string;
 
-  constructor() {
+  constructor(msg: string) {
     super();
+    this.msg = msg
   }
 }
 
@@ -61,6 +63,10 @@ class BinaryOperationNode extends Node {
     this.right = right;
   }
 }
+
+// Known Variables
+
+let variableTable = new Set()
 
 // Variable Nodes
 
@@ -146,10 +152,20 @@ function handleDeclarationNode(tokens: Token[], index: number): NodeWrapper {
     tokens[index + 1].type === TokenType.IDENTIFIER
   ) {
 
+
+    const variable = new VariableNode(tokens[index + 1].value)
+
+    if (variableTable.has(variable)) {
+      return { 
+        node: new ErrorNode(`${tokens[index + 1].value} is used before it is declared`),
+        index: index
+      }
+    }
+
     return {
       node: new DeclarationNode(
         tokens[index].value as unknown as litTypes,
-        new VariableNode(tokens[index + 1].value),
+        variable,
       ),
       index: index + 2,
     };
@@ -158,7 +174,7 @@ function handleDeclarationNode(tokens: Token[], index: number): NodeWrapper {
   return { node: null, index };
 }
 
-function handleStringLiteralNode(tokens: Token[], index: number) {
+function handleStringLiteralNode(tokens: Token[], index: number): NodeWrapper {
   if (tokens[index].type === TokenType.STRING) {
     return {
       node: new StringLiteralNode(tokens[index].value),
@@ -169,7 +185,7 @@ function handleStringLiteralNode(tokens: Token[], index: number) {
   return { node: null, index };
 }
 
-function handleNumberLiteralNode(tokens: Token[], index: number) {
+function handleNumberLiteralNode(tokens: Token[], index: number): NodeWrapper {
   if (tokens[index].type === TokenType.NUMBER) {
     const num: number = Number.parseFloat(tokens[index].value);
 
@@ -179,7 +195,7 @@ function handleNumberLiteralNode(tokens: Token[], index: number) {
   return { node: null, index };
 }
 
-function handleBoolLiteralNode(tokens: Token[], index: number) {
+function handleBoolLiteralNode(tokens: Token[], index: number): NodeWrapper {
   if (tokens[index].type === TokenType.BOOL) {
     if (tokens[index].value === "true") {
       return { node: new BoolLiteralNode(true), index: index + 1 };
@@ -191,13 +207,15 @@ function handleBoolLiteralNode(tokens: Token[], index: number) {
   return { node: null, index };
 }
 
-function handleVariableNode(tokens: Token[], index: number) {
+function handleVariableNode(tokens: Token[], index: number): NodeWrapper {
   if (tokens[index].type === TokenType.IDENTIFIER) {
     return { node: new VariableNode(tokens[index].value), index: index + 1 };
   }
 
   return { node: null, index };
 }
+
+// Check if result of variable is true
 
 function checkBorrower(borrower: NodeWrapper): boolean {
   return borrower.node !== null;
@@ -227,14 +245,14 @@ function handleNode(
     }
   }
 
-  const errNode = new ErrorNode();
+  const errNode = new ErrorNode("no syntax pattern found matching token");
   return { node: errNode, index };
 }
 
 export default function handleNodes(tokens: Array<Token>) {
   log.startLog("NODE");
 
-  let index = 1; // Starts from one because first token is always SOF
+  let index = 1;
   let jumpNode: NodeWrapper = { node: null, index: index };
 
   let nodeQueue: Array<Node> = [];
@@ -243,7 +261,8 @@ export default function handleNodes(tokens: Array<Token>) {
     jumpNode = handleNode(tokens, index);
 
     if (jumpNode.node?.type == "Error") {
-      log.logNodeError(tokens[index].value, index);
+      const errorNode = jumpNode.node as ErrorNode
+      log.logNodeError(`${errorNode.msg}`);
       break;
     }
 
@@ -253,10 +272,8 @@ export default function handleNodes(tokens: Array<Token>) {
   }
 
   if (jumpNode.node?.type !== "Error") {
-    log.logSuccess("nodenized", "NODE");
+    log.logSuccess("NODE");
   }
 
-  const mainCodeBlock: CodeBlockNode = new CodeBlockNode(nodeQueue);
-
-  return mainCodeBlock;
+  return new CodeBlockNode(nodeQueue);
 }
