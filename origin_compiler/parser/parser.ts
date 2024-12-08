@@ -204,5 +204,7 @@ export default function handleNodes(tokens: Array<Token>) {
     log.logSuccess("nodenized", "NODE");
   }
 
-  return new CodeBlockNode(nodeQueue)
+  const mainCodeBlock: CodeBlockNode = new CodeBlockNode(nodeQueue)
+
+  return mainCodeBlock
 }
