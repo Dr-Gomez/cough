@@ -4,7 +4,7 @@ function isKeyword(word: string): boolean {
   return keywords.includes(word);
 }
 
-const types: string[] = ["bool", "int", "float", "char", "array", "type"];
+const types: string[] = ["bool", "int", "float", "char", "array"];
 
 function isType(word: string): boolean {
   return types.includes(word);
