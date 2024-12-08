@@ -260,6 +260,7 @@ export default function handleTokens(
     index: 0,
   };
 
+  tokenQueue.push(jumpToken.token!)
   log.logToken(TokenType[jumpToken.token!.type], jumpToken.token!.value);
 
   let index = 0;
