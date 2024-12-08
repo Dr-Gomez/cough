@@ -25,7 +25,7 @@ class log {
     this.separateLogs();
   }
 
-  private tokenNum: number = 1
+  private tokenNum: number = 0
 
   public logToken(header: string, payload: string) {
     if (payload === "") {
@@ -44,7 +44,7 @@ class log {
       parentNode = "Main";
     }
     this.logArr.push(
-      `${this.timer()}: Appended node ["${childNode}"] to [parent: "${parentNode}"]`,
+      `${this.timer()}: Appended node [child: "${childNode}"] to [parent: "${parentNode}"]`,
     );
   }
 
