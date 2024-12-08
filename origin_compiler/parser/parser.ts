@@ -117,11 +117,27 @@ class MethodNode extends Node {
   }
 }
 
+class TerminatorNode extends Node {
+  type = "Terminator";
+}
+
 // Handler Functions
 
 interface NodeWrapper {
   node: Node | null;
   index: number;
+}
+
+function handleTerminatorNode(tokens: Token[], index: number): NodeWrapper {
+  if(tokens[index].type == TokenType.PUNCTUATOR && tokens[index].value === ";"){
+    return {
+        node: new TerminatorNode(),
+        index: index + 1
+      }
+    
+  }
+
+  return { node: null, index };
 }
 
 function handleDeclarationNode(tokens: Token[], index: number): NodeWrapper {
@@ -190,6 +206,7 @@ function checkBorrower(borrower: NodeWrapper): boolean {
 // Handler functions need to go from highest scope to lowest
 
 const instrQueue: Array<Function> = [
+  handleTerminatorNode,
   handleDeclarationNode,
   handleStringLiteralNode,
   handleNumberLiteralNode,
