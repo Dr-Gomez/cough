@@ -1,6 +1,6 @@
 import handleTokens from "./lexer/lexer.ts";
-import { Token, TokenType, TokenWrapper } from "./lexer/lexer.ts";
-import { CodeBlockNode } from "./parser/parser.ts";
+import { Token } from "./lexer/lexer.ts";
+import handleNode, { CodeBlockNode } from "./parser/parser.ts";
 import log from "./logs/log.ts";
 
 const sourceCode = `
@@ -22,6 +22,7 @@ loop {
 
 `;
 
-let TokenQueue: Token[] = handleTokens(sourceCode);
+let TokenQueue: Array<Token> = handleTokens(sourceCode);
+let NodeTree: CodeBlockNode = handleNode(TokenQueue);
 
 log.showLogs();

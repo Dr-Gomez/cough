@@ -1,7 +1,17 @@
 import { Token, TokenType } from "../lexer/lexer.ts";
+import log from "../logs/log.ts";
 
 abstract class Node {
   abstract type: string;
+}
+
+// Error Node
+class ErrorNode extends Node {
+  type = "Error"
+  
+  constructor() {
+    super()
+  }
 }
 
 // Literal Nodes
@@ -148,7 +158,7 @@ const instrQueue: Array<Function> = [
   handleVariableNode,
 ];
 
-export default function handleNode(
+function handleNode(
   tokens: Array<Token>,
   index: number,
 ) {
@@ -163,4 +173,32 @@ export default function handleNode(
       return borrower;
     }
   }
+
+  const errNode = new ErrorNode
+  return { node: errNode, index }
+}
+
+export default function handleNodes(tokens: Array<Token>) {
+  let index = 0;
+  let jumpNode: NodeWrapper
+
+  let nodeQueue: Array<Node> = []
+
+  while (index < tokens.length) {
+    jumpNode = handleNode(tokens, index);
+    
+    if (jumpNode.node?.type == "Error") {
+      log.logNodeError(tokens[index].value, index)
+      break;
+    }
+
+    nodeQueue.push(jumpNode.node!)
+    index = jumpNode.index
+  }
+
+  if (jumpNode!.node?.type !== "Error") {
+    log.logSuccess("nodes generated", "NODE");
+  }
+
+  return new CodeBlockNode(nodeQueue)
 }

@@ -8,6 +8,16 @@ class log {
     return new Date().toUTCString();
   }
 
+  private separateLogs(): void {
+    this.logArr.push(this.separator);
+  }
+
+  private endLogs(type: string): void {
+    this.separateLogs();
+    this.logArr.push(`${this.timer()}: ${type} LOG ENDED`);
+    this.separateLogs();
+  }
+
   private tokenNum: number = 1
 
   public logToken(header: string, payload: string) {
@@ -51,9 +61,7 @@ class log {
       textIndex += line.length + 1;
     }
 
-    this.separateLogs();
-    this.logArr.push(`${this.timer()}: LOG ENDED`);
-    this.separateLogs();
+    this.endLogs("TOKEN")
     this.logArr.push(
       `${this.timer()}: ERROR: error in character "${
         text[index]
@@ -62,15 +70,13 @@ class log {
   }
 
   public logNodeError(token: string, index: number) {
-    this.separateLogs();
-    this.logArr.push(`${this.timer()}: LOG ENDED`);
-    this.separateLogs();
+    this.endLogs("NODE")
     this.logArr.push(
       `${this.timer()}: ERROR: error in token "${token}", tokenNum: "${index}"`
     );
   }
 
-  public logSuccess(successType: string) {
+  public logSuccess(successType: string, type: string) {
     const endTime = performance.now();
 
     const deltaTime = endTime - this.startTime;
@@ -83,9 +89,7 @@ class log {
       result = `${deltaTime} milliseconds`;
     }
 
-    this.separateLogs();
-    this.logArr.push(`${this.timer()}: LOG ENDED`);
-    this.separateLogs();
+    this.endLogs(type)
     this.logArr.push(
       `${this.timer()}: SUCCESS: Code was successfully ${successType} in ${result}.`,
     );
@@ -98,14 +102,10 @@ class log {
     }
   }
 
-  public separateLogs(): void {
-    this.logArr.push(this.separator);
-  }
-
   constructor() {
     this.startTime = performance.now();
     this.separateLogs();
-    this.logArr.push(`${this.timer()}: LOG STARTED`);
+    this.logArr.push(`${this.timer()}: LOGS STARTED`);
     this.separateLogs();
   }
 }

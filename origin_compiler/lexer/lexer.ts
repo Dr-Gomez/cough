@@ -268,7 +268,7 @@ export default function handleTokens(
     jumpToken = handleToken(source, index);
 
     if (jumpToken.token?.type == TokenType.ERROR) {
-      log.logError(source, index);
+      log.logTokenError(source, index);
       break;
     }
 
@@ -278,7 +278,7 @@ export default function handleTokens(
   }
 
   if (jumpToken.token?.type != TokenType.ERROR) {
-    log.logSuccess("tokenized");
+    log.logSuccess("tokenized", "TOKEN");
   }
 
   return tokenQueue;
