@@ -1,5 +1,3 @@
-import { Token } from "../lexer/lexer.ts";
-
 class log {
   private startTime: number;
 
@@ -10,26 +8,30 @@ class log {
     return new Date().toUTCString();
   }
 
+  private tokenNum: number = 1
+
   public logToken(header: string, payload: string) {
     if (payload === "") {
       payload = "(null)";
     }
 
     this.logArr.push(
-      `${this.timer()}: Created token [header: "${header}"] with value [payload: "${payload}"].`,
+      `${this.timer()}: Created token #${this.tokenNum} [header: "${header}"] with value [payload: "${payload}"].`,
     );
+    
+    this.tokenNum++
   }
 
-  logAppend(parent: Token | "main" | null, token: Token) {
-    if (parent === null) {
-      parent = "main";
+  public logAppend(childNode: string, parentNode: string | null) {
+    if (parentNode === null) {
+      parentNode = "main";
     }
     this.logArr.push(
-      `${this.timer()}: Appended token ["${token}"] to [parent: "${parent}:]`,
+      `${this.timer()}: Appended node ["${childNode}"] to [parent: "${parentNode}:]`,
     );
   }
 
-  public logError(text: string, index: number) {
+  public logTokenError(text: string, index: number) {
     let errPos = { line: 0, char: 0 };
 
     const lines: string[] = text.split("\n");
@@ -56,6 +58,15 @@ class log {
       `${this.timer()}: ERROR: error in character "${
         text[index]
       }" found at [line: ${errPos.line}, pos: ${errPos.char}] of your code`,
+    );
+  }
+
+  public logNodeError(token: string, index: number) {
+    this.separateLogs();
+    this.logArr.push(`${this.timer()}: LOG ENDED`);
+    this.separateLogs();
+    this.logArr.push(
+      `${this.timer()}: ERROR: error in token "${token}", tokenNum: "${index}"`
     );
   }
 
