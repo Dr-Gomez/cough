@@ -70,7 +70,7 @@ class log {
 
     this.endLog("TOKEN")
     this.logArr.push(
-      `${this.timer()}: ERROR: error in character "${
+      `${this.timer()}: ERROR: Error in character "${
         text[index]
       }" found at [line: ${errPos.line}, pos: ${errPos.char}] of your code`,
     );
@@ -79,7 +79,7 @@ class log {
   public logNodeError(token: string, index: number) {
     this.endLog("NODE")
     this.logArr.push(
-      `${this.timer()}: ERROR: error in token "${token}", tokenNum: "${index}"`
+      `${this.timer()}: ERROR: Error in token "${token}", tokenNum: "${index}"`
     );
   }
 
