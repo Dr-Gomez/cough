@@ -5,7 +5,7 @@ import log from "./logs/log.ts";
 
 const sourceCode = `
 
-int 12;
+int num;
 
 `;
 

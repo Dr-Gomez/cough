@@ -253,8 +253,8 @@ function handleToken(
 export default function handleTokens(
   source: string,
 ) {
-  log.startLog("TOKEN")
-  
+  log.startLog("TOKEN");
+
   let tokenQueue: Array<Token> = [];
 
   let jumpToken: TokenWrapper = {
@@ -262,7 +262,7 @@ export default function handleTokens(
     index: 0,
   };
 
-  tokenQueue.push(jumpToken.token!)
+  tokenQueue.push(jumpToken.token!);
   log.logToken(TokenType[jumpToken.token!.type], jumpToken.token!.value);
 
   let index = 0;

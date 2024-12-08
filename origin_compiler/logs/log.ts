@@ -25,7 +25,7 @@ class log {
     this.separateLogs();
   }
 
-  private tokenNum: number = 0
+  private tokenNum: number = 0;
 
   public logToken(header: string, payload: string) {
     if (payload === "") {
@@ -35,8 +35,8 @@ class log {
     this.logArr.push(
       `${this.timer()}: Created token #${this.tokenNum} [header: "${header}"] with value [payload: "${payload}"].`,
     );
-    
-    this.tokenNum++
+
+    this.tokenNum++;
   }
 
   public logAppend(childNode: string, parentNode: string | null) {
@@ -68,7 +68,7 @@ class log {
       textIndex += line.length + 1;
     }
 
-    this.endLog("TOKEN")
+    this.endLog("TOKEN");
     this.logArr.push(
       `${this.timer()}: ERROR: Error in character "${
         text[index]
@@ -77,9 +77,9 @@ class log {
   }
 
   public logNodeError(token: string, index: number) {
-    this.endLog("NODE")
+    this.endLog("NODE");
     this.logArr.push(
-      `${this.timer()}: ERROR: Error in token "${token}", tokenNum: "${index}"`
+      `${this.timer()}: ERROR: Error in token "${token}", tokenNum: "${index}"`,
     );
   }
 
@@ -96,7 +96,7 @@ class log {
       result = `${deltaTime} milliseconds`;
     }
 
-    this.endLog(type)
+    this.endLog(type);
     this.logArr.push(
       `${this.timer()}: SUCCESS: Code was successfully ${successType} in ${result}.`,
     );
@@ -108,7 +108,6 @@ class log {
       console.log(this.logArr[i]);
     }
   }
-
 }
 
 export default new log();

@@ -7,10 +7,10 @@ abstract class Node {
 
 // Error Node
 class ErrorNode extends Node {
-  type = "Error"
-  
+  type = "Error";
+
   constructor() {
-    super()
+    super();
   }
 }
 
@@ -76,6 +76,25 @@ class VariableNode extends Node {
 
 // Control Flow Nodes
 
+interface litTypes {
+  litType: "bool" | "int" | "float" | "char" | "array";
+}
+
+class DeclarationNode extends Node {
+  type = "Declaration";
+  litType: litTypes;
+  variable: VariableNode;
+
+  constructor(
+    litType: litTypes,
+    variable: VariableNode,
+  ) {
+    super();
+    this.litType = litType;
+    this.variable = variable;
+  }
+}
+
 export class CodeBlockNode extends Node {
   type = "CodeBlock";
   statements: Node[];
@@ -103,6 +122,24 @@ class MethodNode extends Node {
 interface NodeWrapper {
   node: Node | null;
   index: number;
+}
+
+function handleDeclarationNode(tokens: Token[], index: number): NodeWrapper {
+  if (
+    tokens[index].type === TokenType.TYPE &&
+    tokens[index + 1].type === TokenType.IDENTIFIER
+  ) {
+
+    return {
+      node: new DeclarationNode(
+        tokens[index].value as unknown as litTypes,
+        new VariableNode(tokens[index + 1].value),
+      ),
+      index: index + 2,
+    };
+  }
+
+  return { node: null, index };
 }
 
 function handleStringLiteralNode(tokens: Token[], index: number) {
@@ -150,9 +187,10 @@ function checkBorrower(borrower: NodeWrapper): boolean {
   return borrower.node !== null;
 }
 
-// Handler functions need to go from highest scope to slowest
+// Handler functions need to go from highest scope to lowest
 
 const instrQueue: Array<Function> = [
+  handleDeclarationNode,
   handleStringLiteralNode,
   handleNumberLiteralNode,
   handleBoolLiteralNode,
@@ -165,46 +203,43 @@ function handleNode(
 ) {
   let borrower: NodeWrapper;
 
-  borrower = instrQueue[0](tokens, index);
-  index = borrower.index;
-
-  for (let i = 1; i < instrQueue.length; i++) {
+  for (let i = 0; i < instrQueue.length; i++) {
     borrower = instrQueue[i](tokens, index);
     if (checkBorrower(borrower)) {
       return borrower;
     }
   }
 
-  const errNode = new ErrorNode
-  return { node: errNode, index }
+  const errNode = new ErrorNode();
+  return { node: errNode, index };
 }
 
 export default function handleNodes(tokens: Array<Token>) {
-  log.startLog("NODE")
-  
-  let index = 1; // Starts from one because first token is always SOF
-  let jumpNode: NodeWrapper = { node: null, index: index }
+  log.startLog("NODE");
 
-  let nodeQueue: Array<Node> = []
+  let index = 1; // Starts from one because first token is always SOF
+  let jumpNode: NodeWrapper = { node: null, index: index };
+
+  let nodeQueue: Array<Node> = [];
 
   while (tokens[index].type !== TokenType.EOF) {
     jumpNode = handleNode(tokens, index);
-    
+
     if (jumpNode.node?.type == "Error") {
-      log.logNodeError(tokens[index].value, index)
+      log.logNodeError(tokens[index].value, index);
       break;
     }
 
-    nodeQueue.push(jumpNode.node!)
-    index = jumpNode.index
-    log.logAppend(jumpNode.node!.type, null)
+    nodeQueue.push(jumpNode.node!);
+    index = jumpNode.index;
+    log.logAppend(jumpNode.node!.type, null);
   }
 
   if (jumpNode.node?.type !== "Error") {
     log.logSuccess("nodenized", "NODE");
   }
 
-  const mainCodeBlock: CodeBlockNode = new CodeBlockNode(nodeQueue)
+  const mainCodeBlock: CodeBlockNode = new CodeBlockNode(nodeQueue);
 
-  return mainCodeBlock
+  return mainCodeBlock;
 }
