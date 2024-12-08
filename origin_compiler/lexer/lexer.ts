@@ -253,6 +253,8 @@ function handleToken(
 export default function handleTokens(
   source: string,
 ) {
+  log.startLog("TOKEN")
+  
   let tokenQueue: Array<Token> = [];
 
   let jumpToken: TokenWrapper = {

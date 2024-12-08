@@ -180,6 +180,8 @@ function handleNode(
 }
 
 export default function handleNodes(tokens: Array<Token>) {
+  log.startLog("NODE")
+  
   let index = 1; // Starts from one because first token is always SOF
   let jumpNode: NodeWrapper = { node: null, index: index }
 

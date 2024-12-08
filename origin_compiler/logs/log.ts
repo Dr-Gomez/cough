@@ -1,7 +1,7 @@
 class log {
   private startTime: number;
 
-  private separator = "------------------------------------------";
+  private separator = "---------------------------------------------------";
   private logArr: Array<string> = [];
 
   private timer(): string {
@@ -12,9 +12,16 @@ class log {
     this.logArr.push(this.separator);
   }
 
-  private endLogs(type: string): void {
+  private endLog(type: string): void {
     this.separateLogs();
     this.logArr.push(`${this.timer()}: ${type} LOG ENDED`);
+    this.separateLogs();
+  }
+
+  public startLog(type: string): void {
+    this.startTime = performance.now();
+    this.separateLogs();
+    this.logArr.push(`${this.timer()}: ${type} LOG STARTED`);
     this.separateLogs();
   }
 
@@ -61,7 +68,7 @@ class log {
       textIndex += line.length + 1;
     }
 
-    this.endLogs("TOKEN")
+    this.endLog("TOKEN")
     this.logArr.push(
       `${this.timer()}: ERROR: error in character "${
         text[index]
@@ -70,7 +77,7 @@ class log {
   }
 
   public logNodeError(token: string, index: number) {
-    this.endLogs("NODE")
+    this.endLog("NODE")
     this.logArr.push(
       `${this.timer()}: ERROR: error in token "${token}", tokenNum: "${index}"`
     );
@@ -89,7 +96,7 @@ class log {
       result = `${deltaTime} milliseconds`;
     }
 
-    this.endLogs(type)
+    this.endLog(type)
     this.logArr.push(
       `${this.timer()}: SUCCESS: Code was successfully ${successType} in ${result}.`,
     );
@@ -102,12 +109,6 @@ class log {
     }
   }
 
-  constructor() {
-    this.startTime = performance.now();
-    this.separateLogs();
-    this.logArr.push(`${this.timer()}: LOGS STARTED`);
-    this.separateLogs();
-  }
 }
 
 export default new log();
