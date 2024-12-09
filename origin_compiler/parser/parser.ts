@@ -1,133 +1,29 @@
 import { Token, TokenType } from "../lexer/lexer.ts";
+
+import {
+  matchBoolRule,
+  matchDeclarationRule,
+  matchNumberRule,
+  matchStringRule,
+  matchTerminatorRule,
+  matchVariableRule,
+} from "./rules.ts";
+
+import {
+  Node,
+  ErrorNode,
+  VariableNode,
+  TerminatorNode,
+  BoolLiteralNode,
+  NumberLiteralNode,
+  StringLiteralNode,
+  DeclarationNode,
+  BinaryOperationNode,
+  CodeBlockNode
+} from "./nodes.ts"
+
 import log from "../logs/log.ts";
 
-abstract class Node {
-  abstract type: string;
-}
-
-// Error Node
-class ErrorNode extends Node {
-  type = "Error";
-  msg: string;
-
-  constructor(msg: string) {
-    super();
-    this.msg = msg
-  }
-}
-
-// Literal Nodes
-
-class NumberLiteralNode extends Node {
-  type = "NumberLiteral";
-  value: number;
-
-  constructor(value: number) {
-    super();
-    this.value = value;
-  }
-}
-
-class StringLiteralNode extends Node {
-  type = "StringLiteral";
-  value: string;
-
-  constructor(value: string) {
-    super();
-    this.value = value;
-  }
-}
-
-class BoolLiteralNode extends Node {
-  type = "BoolLiteral";
-  value: boolean;
-
-  constructor(value: boolean) {
-    super();
-    this.value = value;
-  }
-}
-
-// Operation Nodes
-
-class BinaryOperationNode extends Node {
-  type = "BinaryOperation";
-  left: Node;
-  operator: string;
-  right: Node;
-
-  constructor(left: Node, operator: string, right: Node) {
-    super();
-    this.left = left;
-    this.operator = operator;
-    this.right = right;
-  }
-}
-
-// Known Variables
-
-let variableTable = new Set()
-
-// Variable Nodes
-
-class VariableNode extends Node {
-  type = "Variable";
-  name: string;
-
-  constructor(name: string) {
-    super();
-    this.name = name;
-  }
-}
-
-// Control Flow Nodes
-
-interface litTypes {
-  litType: "bool" | "int" | "float" | "char" | "array";
-}
-
-class DeclarationNode extends Node {
-  type = "Declaration";
-  litType: litTypes;
-  variable: VariableNode;
-
-  constructor(
-    litType: litTypes,
-    variable: VariableNode,
-  ) {
-    super();
-    this.litType = litType;
-    this.variable = variable;
-  }
-}
-
-export class CodeBlockNode extends Node {
-  type = "CodeBlock";
-  statements: Node[];
-
-  constructor(statements: Node[]) {
-    super();
-    this.statements = statements;
-  }
-}
-
-class MethodNode extends Node {
-  type = "Method";
-  parameters: Node[];
-  block: CodeBlockNode;
-
-  constructor(parameters: Node[], block: CodeBlockNode) {
-    super();
-    this.parameters = parameters;
-    this.block = block;
-  }
-}
-
-class TerminatorNode extends Node {
-  type = "Terminator";
-}
-
-// Handler Functions
 
 interface NodeWrapper {
   node: Node | null;
@@ -135,36 +31,38 @@ interface NodeWrapper {
 }
 
 function handleTerminatorNode(tokens: Token[], index: number): NodeWrapper {
-  if(tokens[index].type == TokenType.PUNCTUATOR && tokens[index].value === ";"){
+  if (
+    matchTerminatorRule(tokens[index])
+  ) {
     return {
-        node: new TerminatorNode(),
-        index: index + 1
-      }
-    
+      node: new TerminatorNode(),
+      index: index + 1,
+    };
   }
 
   return { node: null, index };
 }
 
+const varTable = new Set()
+
 function handleDeclarationNode(tokens: Token[], index: number): NodeWrapper {
   if (
-    tokens[index].type === TokenType.TYPE &&
-    tokens[index + 1].type === TokenType.IDENTIFIER
+    matchDeclarationRule(tokens[index], tokens[index + 1])
   ) {
+    const variable = new VariableNode(tokens[index + 1].value);
 
-
-    const variable = new VariableNode(tokens[index + 1].value)
-
-    if (variableTable.has(variable)) {
-      return { 
-        node: new ErrorNode(`${tokens[index + 1].value} is used before it is declared`),
-        index: index
-      }
+    if (varTable.has(variable)) {
+      return {
+        node: new ErrorNode(
+          `${tokens[index + 1].value} is used before it is declared`,
+        ),
+        index: index,
+      };
     }
 
     return {
       node: new DeclarationNode(
-        tokens[index].value as unknown as litTypes,
+        tokens[index].value as unknown as "bool" | "int" | "float" | "char" | "array",
         variable,
       ),
       index: index + 2,
@@ -175,7 +73,7 @@ function handleDeclarationNode(tokens: Token[], index: number): NodeWrapper {
 }
 
 function handleStringLiteralNode(tokens: Token[], index: number): NodeWrapper {
-  if (tokens[index].type === TokenType.STRING) {
+  if (matchStringRule(tokens[index])) {
     return {
       node: new StringLiteralNode(tokens[index].value),
       index: index + 1,
@@ -186,7 +84,7 @@ function handleStringLiteralNode(tokens: Token[], index: number): NodeWrapper {
 }
 
 function handleNumberLiteralNode(tokens: Token[], index: number): NodeWrapper {
-  if (tokens[index].type === TokenType.NUMBER) {
+  if (matchNumberRule(tokens[index])) {
     const num: number = Number.parseFloat(tokens[index].value);
 
     return { node: new NumberLiteralNode(num), index: index + 1 };
@@ -196,7 +94,7 @@ function handleNumberLiteralNode(tokens: Token[], index: number): NodeWrapper {
 }
 
 function handleBoolLiteralNode(tokens: Token[], index: number): NodeWrapper {
-  if (tokens[index].type === TokenType.BOOL) {
+  if (matchBoolRule(tokens[index])) {
     if (tokens[index].value === "true") {
       return { node: new BoolLiteralNode(true), index: index + 1 };
     } else {
@@ -208,7 +106,7 @@ function handleBoolLiteralNode(tokens: Token[], index: number): NodeWrapper {
 }
 
 function handleVariableNode(tokens: Token[], index: number): NodeWrapper {
-  if (tokens[index].type === TokenType.IDENTIFIER) {
+  if (matchVariableRule(tokens[index])) {
     return { node: new VariableNode(tokens[index].value), index: index + 1 };
   }
 
@@ -261,7 +159,7 @@ export default function handleNodes(tokens: Array<Token>) {
     jumpNode = handleNode(tokens, index);
 
     if (jumpNode.node?.type == "Error") {
-      const errorNode = jumpNode.node as ErrorNode
+      const errorNode = jumpNode.node as ErrorNode;
       log.logNodeError(`${errorNode.msg}`);
       break;
     }

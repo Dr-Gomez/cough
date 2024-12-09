@@ -98,7 +98,9 @@ class log {
 
     this.endLog(type);
     this.logArr.push(
-      `${this.timer()}: SUCCESS: Code was successfully ${type + "NIZED"} in ${result}.`,
+      `${this.timer()}: SUCCESS: Code was successfully ${
+        type + "NIZED"
+      } in ${result}.`,
     );
     this.separateLogs();
   }
