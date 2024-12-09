@@ -19,7 +19,13 @@ import {
   NumberLiteralNode,
   StringLiteralNode,
   DeclarationNode,
-  BinaryOperationNode,
+  IncrementNode,
+  DecrementNode,
+  AssignmentNode,
+  AdditionNode,
+  SubtractionNode,
+  MultiplicationNode,
+  DivisionNode,
   CodeBlockNode
 } from "./nodes.ts"
 
@@ -44,7 +50,6 @@ function handleTerminatorNode(tokens: Token[], index: number): NodeWrapper {
   return { node: null, index };
 }
 
-const varTable = new Set()
 
 
 function handleStringLiteralNode(tokens: Token[], index: number): NodeWrapper {
@@ -88,24 +93,24 @@ function handleVariableNode(tokens: Token[], index: number): NodeWrapper {
   return { node: null, index };
 }
 
-function checkBorrower(borrower: NodeWrapper): boolean {
-  return borrower.node !== null;
-}
+const varTable = new Set()
 
 function handleDeclarationNode(tokens: Token[], index: number): NodeWrapper {
   if (
     matchDeclarationRule(tokens[index], tokens[index + 1])
   ) {
     const variable = new VariableNode(tokens[index + 1].value);
-
+    
     if (varTable.has(variable)) {
       return {
         node: new ErrorNode(
-          `${tokens[index + 1].value} is used before it is declared`,
+          `${tokens[index + 1].value} being declared again`,
         ),
         index: index,
       };
     }
+    
+    varTable.add(variable)
 
     return {
       node: new DeclarationNode(
@@ -123,6 +128,10 @@ function handleBinaryOperation(tokens: Token[], index: number) {
   if(matchBinaryOperationRule(tokens[index + 1])) {
     console.log("ruled")
   }
+}
+
+function checkBorrower(borrower: NodeWrapper): boolean {
+  return borrower.node !== null;
 }
 
 // Handler functions need to go from highest scope to lowest
@@ -148,7 +157,7 @@ function handleNode(
       return borrower;
     }
   }
-
+  
   const errNode = new ErrorNode("no syntax pattern found matching token");
   return { node: errNode, index };
 }
