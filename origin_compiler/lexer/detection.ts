@@ -30,7 +30,7 @@ function isOperatorChar(char: string): boolean {
   return operatorChars.includes(char);
 }
 
-const unaryOperators: string[] = ["++", "--", "~~", "+~", "-~"];
+const unaryOperators: string[] = ["++", "--", "~~"];
 
 function isUnaryOperator(op: string): boolean {
   return unaryOperators.includes(op);
