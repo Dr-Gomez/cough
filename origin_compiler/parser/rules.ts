@@ -1,5 +1,12 @@
 import { Token, TokenType } from "../lexer/lexer.ts";
 
+function matchBinaryOperationRule(token: Token) {
+  if (token.type = TokenType.BIN_OPERATOR) {
+    return true
+  } 
+  return false;
+}
+
 function matchDeclarationRule(lToken: Token, rToken: Token) {
   if (lToken.type === TokenType.TYPE && rToken.type === TokenType.IDENTIFIER) {
     return true;
@@ -43,8 +50,9 @@ function matchVariableRule(token: Token) {
 }
 
 export {
-  matchBoolRule,
+  matchBinaryOperationRule,
   matchDeclarationRule,
+  matchBoolRule,
   matchNumberRule,
   matchStringRule,
   matchTerminatorRule,
