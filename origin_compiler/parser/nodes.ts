@@ -44,26 +44,91 @@ class ErrorNode extends Node {
     }
   }
   
-  // Operation Nodes
+  // Unary Operation Nodes
+
+  class IncrementNode extends Node {
+    type = "Increment";
+    variable: VariableNode;
+
+    constructor(variable: VariableNode) {
+      super();
+      this.variable = variable;
+    }
+  }
+
+  class DecrementNode extends Node {
+    type = "Increment";
+    variable: VariableNode;
+
+    constructor(variable: VariableNode) {
+      super();
+      this.variable = variable;
+    }
+  }
+
+  // Binary Operation Nodes
   
-  class BinaryOperationNode extends Node {
-    type = "BinaryOperation";
-    left: Node;
-    operator: string;
+  class AssignmentNode extends Node {
+    type = "Assignment"
+    left: VariableNode;
     right: Node;
-  
-    constructor(left: Node, operator: string, right: Node) {
+
+    constructor(left: VariableNode, right: Node) {
       super();
       this.left = left;
-      this.operator = operator;
       this.right = right;
     }
   }
-  
-  // Known Variables
-  
-  let variableTable = new Set();
-  
+
+  class AdditionNode extends Node {
+    type = "Addition";
+    left: Node;
+    right: Node;
+
+    constructor(left: Node, right: Node) {
+      super();
+      this.left = left;
+      this.right = right;
+    }
+  }
+
+  class SubtractionNode extends Node {
+    type = "Addition";
+    left: Node;
+    right: Node;
+
+    constructor(left: Node, right: Node) {
+      super();
+      this.left = left;
+      this.right = right;
+    }
+  }
+
+  class MultiplicationNode extends Node {
+    type = "Addition";
+    left: Node;
+    right: Node;
+
+    constructor(left: Node, right: Node) {
+      super();
+      this.left = left;
+      this.right = right;
+    }
+  }
+
+  class DivisionNode extends Node {
+    type = "Addition";
+    left: Node;
+    right: Node;
+
+    constructor(left: Node, right: Node) {
+      super();
+      this.left = left;
+      this.right = right;
+    }
+  }
+
+
   // Variable Nodes
   
   class VariableNode extends Node {
@@ -119,4 +184,4 @@ class CodeBlockNode extends Node {
     type = "Terminator";
   }
 
-  export { Node, ErrorNode, VariableNode, TerminatorNode , BoolLiteralNode, NumberLiteralNode, StringLiteralNode, DeclarationNode, BinaryOperationNode, CodeBlockNode }
+  export { Node, ErrorNode, VariableNode, TerminatorNode , BoolLiteralNode, NumberLiteralNode, StringLiteralNode, DeclarationNode, IncrementNode, DecrementNode, AssignmentNode, AdditionNode, SubtractionNode, MultiplicationNode, DivisionNode, CodeBlockNode }
