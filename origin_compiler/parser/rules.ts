@@ -73,6 +73,8 @@ function matchVariableRule(token: Token) {
 export {
   matchBinaryOperationRule,
   matchUnaryOperationRule,
+  matchIncrementRule,
+  matchDecrementRule,
   matchDeclarationRule,
   matchBoolRule,
   matchNumberRule,
