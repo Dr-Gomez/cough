@@ -1,8 +1,9 @@
 import { Token, TokenType } from "../lexer/lexer.ts";
 
 import {
-  matchBoolRule,
+  matchBinaryOperationRule,
   matchDeclarationRule,
+  matchBoolRule,
   matchNumberRule,
   matchStringRule,
   matchTerminatorRule,
@@ -45,6 +46,52 @@ function handleTerminatorNode(tokens: Token[], index: number): NodeWrapper {
 
 const varTable = new Set()
 
+
+function handleStringLiteralNode(tokens: Token[], index: number): NodeWrapper {
+  if (matchStringRule(tokens[index])) {
+    return {
+      node: new StringLiteralNode(tokens[index].value),
+      index: index + 1,
+    };
+  }
+  
+  return { node: null, index };
+}
+
+function handleNumberLiteralNode(tokens: Token[], index: number): NodeWrapper {
+  if (matchNumberRule(tokens[index])) {
+    const num: number = Number.parseFloat(tokens[index].value);
+    
+    return { node: new NumberLiteralNode(num), index: index + 1 };
+  }
+  
+  return { node: null, index };
+}
+
+function handleBoolLiteralNode(tokens: Token[], index: number): NodeWrapper {
+  if (matchBoolRule(tokens[index])) {
+    if (tokens[index].value === "true") {
+      return { node: new BoolLiteralNode(true), index: index + 1 };
+    } else {
+      return { node: new BoolLiteralNode(true), index: index + 1 };
+    }
+  }
+  
+  return { node: null, index };
+}
+
+function handleVariableNode(tokens: Token[], index: number): NodeWrapper {
+  if (matchVariableRule(tokens[index])) {
+    return { node: new VariableNode(tokens[index].value), index: index + 1 };
+  }
+  
+  return { node: null, index };
+}
+
+function checkBorrower(borrower: NodeWrapper): boolean {
+  return borrower.node !== null;
+}
+
 function handleDeclarationNode(tokens: Token[], index: number): NodeWrapper {
   if (
     matchDeclarationRule(tokens[index], tokens[index + 1])
@@ -72,51 +119,10 @@ function handleDeclarationNode(tokens: Token[], index: number): NodeWrapper {
   return { node: null, index };
 }
 
-function handleStringLiteralNode(tokens: Token[], index: number): NodeWrapper {
-  if (matchStringRule(tokens[index])) {
-    return {
-      node: new StringLiteralNode(tokens[index].value),
-      index: index + 1,
-    };
+function handleBinaryOperation(tokens: Token[], index: number) {
+  if(matchBinaryOperationRule(tokens[index + 1])) {
+    console.log("ruled")
   }
-
-  return { node: null, index };
-}
-
-function handleNumberLiteralNode(tokens: Token[], index: number): NodeWrapper {
-  if (matchNumberRule(tokens[index])) {
-    const num: number = Number.parseFloat(tokens[index].value);
-
-    return { node: new NumberLiteralNode(num), index: index + 1 };
-  }
-
-  return { node: null, index };
-}
-
-function handleBoolLiteralNode(tokens: Token[], index: number): NodeWrapper {
-  if (matchBoolRule(tokens[index])) {
-    if (tokens[index].value === "true") {
-      return { node: new BoolLiteralNode(true), index: index + 1 };
-    } else {
-      return { node: new BoolLiteralNode(true), index: index + 1 };
-    }
-  }
-
-  return { node: null, index };
-}
-
-function handleVariableNode(tokens: Token[], index: number): NodeWrapper {
-  if (matchVariableRule(tokens[index])) {
-    return { node: new VariableNode(tokens[index].value), index: index + 1 };
-  }
-
-  return { node: null, index };
-}
-
-// Check if result of variable is true
-
-function checkBorrower(borrower: NodeWrapper): boolean {
-  return borrower.node !== null;
 }
 
 // Handler functions need to go from highest scope to lowest
@@ -135,7 +141,7 @@ function handleNode(
   index: number,
 ) {
   let borrower: NodeWrapper;
-
+  
   for (let i = 0; i < instrQueue.length; i++) {
     borrower = instrQueue[i](tokens, index);
     if (checkBorrower(borrower)) {
