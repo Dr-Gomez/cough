@@ -1,5 +1,5 @@
 class Node {
-    type: string;
+  type: string;
 }
 
 class ErrorNode extends Node {
@@ -16,7 +16,7 @@ class StartNode extends Node {
   type = "Start";
 
   constructor() {
-    super()
+    super();
   }
 }
 
@@ -95,7 +95,7 @@ class NegationNode extends Node {
 // Binary Operation Nodes
 
 class AssignmentNode extends Node {
-  type = "Assignment"
+  type = "Assignment";
   left: VariableNode;
   right: Node;
 
@@ -154,7 +154,6 @@ class DivisionNode extends Node {
   }
 }
 
-
 // Variable Nodes
 
 class VariableNode extends Node {
@@ -210,4 +209,24 @@ class TerminatorNode extends Node {
   type = "Terminator";
 }
 
-export { Node, ErrorNode, StartNode, EndNode, VariableNode, TerminatorNode , BoolLiteralNode, NumberLiteralNode, StringLiteralNode, DeclarationNode, IncrementNode, DecrementNode, NegationNode, AssignmentNode, AdditionNode, SubtractionNode, MultiplicationNode, DivisionNode, CodeBlockNode }
+export {
+  AdditionNode,
+  AssignmentNode,
+  BoolLiteralNode,
+  CodeBlockNode,
+  DeclarationNode,
+  DecrementNode,
+  DivisionNode,
+  EndNode,
+  ErrorNode,
+  IncrementNode,
+  MultiplicationNode,
+  NegationNode,
+  Node,
+  NumberLiteralNode,
+  StartNode,
+  StringLiteralNode,
+  SubtractionNode,
+  TerminatorNode,
+  VariableNode,
+};

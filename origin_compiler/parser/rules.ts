@@ -3,7 +3,7 @@ import { Token, TokenType } from "../lexer/lexer.ts";
 function matchBinaryOperationRule(token: Token) {
   if (token.type === TokenType.BIN_OPERATOR) {
     return true;
-  } 
+  }
   return false;
 }
 
@@ -14,29 +14,32 @@ function matchUnaryOperationRule(token: Token) {
   return false;
 }
 
-function matchIncrementRule(token: Token){
+function matchIncrementRule(token: Token) {
   if (token.value === "++") {
     return true;
   }
   return false;
 }
 
-function matchDecrementRule(token: Token){
+function matchDecrementRule(token: Token) {
   if (token.value === "--") {
     return true;
   }
   return false;
 }
 
-function matchNegationRule(token: Token){
+function matchNegationRule(token: Token) {
   if (token.value === "~~") {
     return true;
   }
-  return false
+  return false;
 }
 
 function matchDeclarationRule(baseToken: Token, loohaheadToken: Token) {
-  if (baseToken.type === TokenType.TYPE && loohaheadToken.type === TokenType.IDENTIFIER) {
+  if (
+    baseToken.type === TokenType.TYPE &&
+    loohaheadToken.type === TokenType.IDENTIFIER
+  ) {
     return true;
   }
   return false;
@@ -81,20 +84,20 @@ function matchEOFRule(tokens: Token) {
   if (tokens.type === TokenType.EOF) {
     return true;
   }
-  return false
+  return false;
 }
 
 export {
   matchBinaryOperationRule,
-  matchUnaryOperationRule,
-  matchIncrementRule,
-  matchDecrementRule,
-  matchNegationRule,
-  matchDeclarationRule,
   matchBoolRule,
+  matchDeclarationRule,
+  matchDecrementRule,
+  matchEOFRule,
+  matchIncrementRule,
+  matchNegationRule,
   matchNumberRule,
   matchStringRule,
   matchTerminatorRule,
+  matchUnaryOperationRule,
   matchVariableRule,
-  matchEOFRule,
 };

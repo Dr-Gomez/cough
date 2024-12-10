@@ -2,43 +2,42 @@ import { Token, TokenType } from "../lexer/lexer.ts";
 
 import {
   matchBinaryOperationRule,
-  matchUnaryOperationRule,
-  matchIncrementRule,
-  matchDecrementRule,
-  matchNegationRule,
-  matchDeclarationRule,
   matchBoolRule,
+  matchDeclarationRule,
+  matchDecrementRule,
+  matchEOFRule,
+  matchIncrementRule,
+  matchNegationRule,
   matchNumberRule,
   matchStringRule,
   matchTerminatorRule,
+  matchUnaryOperationRule,
   matchVariableRule,
-  matchEOFRule,
 } from "./rules.ts";
 
 import {
-  Node,
-  ErrorNode,
-  StartNode,
-  EndNode,
-  VariableNode,
-  TerminatorNode,
-  BoolLiteralNode,
-  NumberLiteralNode,
-  StringLiteralNode,
-  DeclarationNode,
-  IncrementNode,
-  DecrementNode,
-  NegationNode,
-  AssignmentNode,
   AdditionNode,
-  SubtractionNode,
-  MultiplicationNode,
+  AssignmentNode,
+  BoolLiteralNode,
+  CodeBlockNode,
+  DeclarationNode,
+  DecrementNode,
   DivisionNode,
-  CodeBlockNode
-} from "./nodes.ts"
+  EndNode,
+  ErrorNode,
+  IncrementNode,
+  MultiplicationNode,
+  NegationNode,
+  Node,
+  NumberLiteralNode,
+  StartNode,
+  StringLiteralNode,
+  SubtractionNode,
+  TerminatorNode,
+  VariableNode,
+} from "./nodes.ts";
 
 import log from "../logs/log.ts";
-
 
 interface NodeWrapper {
   node: Node | null;
@@ -48,12 +47,12 @@ interface NodeWrapper {
 function handleEOF(tokens: Token[], index: number): NodeWrapper {
   if (matchEOFRule(tokens[index])) {
     return {
-      node: new TerminatorNode(),
-      index: index
-    }
+      node: new EndNode(),
+      index: index,
+    };
   }
 
-  return { node: null, index }
+  return { node: null, index };
 }
 
 function handleTerminatorNode(tokens: Token[], index: number): NodeWrapper {
@@ -69,8 +68,6 @@ function handleTerminatorNode(tokens: Token[], index: number): NodeWrapper {
   return { node: null, index };
 }
 
-
-
 function handleStringLiteralNode(tokens: Token[], index: number): NodeWrapper {
   if (matchStringRule(tokens[index])) {
     return {
@@ -78,17 +75,17 @@ function handleStringLiteralNode(tokens: Token[], index: number): NodeWrapper {
       index: index + 1,
     };
   }
-  
+
   return { node: null, index };
 }
 
 function handleNumberLiteralNode(tokens: Token[], index: number): NodeWrapper {
   if (matchNumberRule(tokens[index])) {
     const num: number = Number.parseFloat(tokens[index].value);
-    
+
     return { node: new NumberLiteralNode(num), index: index + 1 };
   }
-  
+
   return { node: null, index };
 }
 
@@ -100,7 +97,7 @@ function handleBoolLiteralNode(tokens: Token[], index: number): NodeWrapper {
       return { node: new BoolLiteralNode(true), index: index + 1 };
     }
   }
-  
+
   return { node: null, index };
 }
 
@@ -108,18 +105,18 @@ function handleVariableNode(tokens: Token[], index: number): NodeWrapper {
   if (matchVariableRule(tokens[index])) {
     return { node: new VariableNode(tokens[index].value), index: index + 1 };
   }
-  
+
   return { node: null, index };
 }
 
-const varTable = new Map()
+const varTable = new Map();
 
 function handleDeclarationNode(tokens: Token[], index: number): NodeWrapper {
   if (
     matchDeclarationRule(tokens[index], tokens[index + 1])
   ) {
     const variable = new VariableNode(tokens[index + 1].value);
-    
+
     if (varTable.has(tokens[index + 1].value)) {
       return {
         node: new ErrorNode(
@@ -128,12 +125,17 @@ function handleDeclarationNode(tokens: Token[], index: number): NodeWrapper {
         index: index,
       };
     }
-    
-    varTable.set(tokens[index + 1].value, variable)
+
+    varTable.set(tokens[index + 1].value, variable);
 
     return {
       node: new DeclarationNode(
-        tokens[index].value as unknown as "bool" | "int" | "float" | "char" | "array",
+        tokens[index].value as unknown as
+          | "bool"
+          | "int"
+          | "float"
+          | "char"
+          | "array",
         variable,
       ),
       index: index + 2,
@@ -148,26 +150,26 @@ function handleUnaryOperator(tokens: Token[], index: number): NodeWrapper {
     if (matchIncrementRule(tokens[index + 1])) {
       return {
         node: new IncrementNode(varTable.get(tokens[index].value)),
-        index: index + 2
-      }
+        index: index + 2,
+      };
     }
 
     if (matchDecrementRule(tokens[index + 1])) {
       return {
         node: new DecrementNode(varTable.get(tokens[index].value)),
-        index: index + 2
-      }
+        index: index + 2,
+      };
     }
 
     if (matchNegationRule(tokens[index + 1])) {
       return {
         node: new NegationNode(varTable.get(tokens[index].value)),
-        index: index + 2
-      }
+        index: index + 2,
+      };
     }
   }
 
-  return { node: null, index }
+  return { node: null, index };
 }
 
 function checkBorrower(borrower: NodeWrapper): boolean {
@@ -192,14 +194,14 @@ function handleNode(
   index: number,
 ) {
   let borrower: NodeWrapper;
-  
+
   for (let i = 0; i < instrQueue.length; i++) {
     borrower = instrQueue[i](tokens, index);
     if (checkBorrower(borrower)) {
       return borrower;
     }
   }
-  
+
   const errNode = new ErrorNode("no syntax pattern found matching token");
   return { node: errNode, index };
 }
@@ -211,10 +213,10 @@ export default function handleNodes(tokens: Array<Token>) {
   let nodeQueue: Array<Node> = [];
 
   let jumpNode: NodeWrapper = { node: new StartNode(), index: index };
-  nodeQueue.push(jumpNode.node!)
-  log.logAppend(jumpNode.node!.type, null)
+  nodeQueue.push(jumpNode.node!);
+  log.logAppend(jumpNode.node!.type, null);
 
-  while (tokens[index].type !== TokenType.EOF) {
+  while (jumpNode.node!.type !== "End") {
     jumpNode = handleNode(tokens, index);
 
     if (jumpNode.node?.type == "Error") {
