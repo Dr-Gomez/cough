@@ -57,12 +57,22 @@ class ErrorNode extends Node {
   }
 
   class DecrementNode extends Node {
-    type = "Increment";
+    type = "Decrement";
     variable: VariableNode;
 
     constructor(variable: VariableNode) {
       super();
       this.variable = variable;
+    }
+  }
+
+  class NegationNode extends Node {
+    type = "Negation";
+    variable: VariableNode;
+
+    constructor(variable: VariableNode) {
+      super();
+      this.variable;
     }
   }
 
@@ -184,4 +194,4 @@ class CodeBlockNode extends Node {
     type = "Terminator";
   }
 
-  export { Node, ErrorNode, VariableNode, TerminatorNode , BoolLiteralNode, NumberLiteralNode, StringLiteralNode, DeclarationNode, IncrementNode, DecrementNode, AssignmentNode, AdditionNode, SubtractionNode, MultiplicationNode, DivisionNode, CodeBlockNode }
+  export { Node, ErrorNode, VariableNode, TerminatorNode , BoolLiteralNode, NumberLiteralNode, StringLiteralNode, DeclarationNode, IncrementNode, DecrementNode, NegationNode, AssignmentNode, AdditionNode, SubtractionNode, MultiplicationNode, DivisionNode, CodeBlockNode }

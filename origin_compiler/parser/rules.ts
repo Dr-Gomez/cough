@@ -28,6 +28,13 @@ function matchDecrementRule(token: Token){
   return false;
 }
 
+function matchNegationRule(token: Token){
+  if (token.value === "~~") {
+    return true;
+  }
+  return false
+}
+
 function matchDeclarationRule(lToken: Token, rToken: Token) {
   if (lToken.type === TokenType.TYPE && rToken.type === TokenType.IDENTIFIER) {
     return true;
@@ -75,6 +82,7 @@ export {
   matchUnaryOperationRule,
   matchIncrementRule,
   matchDecrementRule,
+  matchNegationRule,
   matchDeclarationRule,
   matchBoolRule,
   matchNumberRule,
