@@ -35,8 +35,8 @@ function matchNegationRule(token: Token){
   return false
 }
 
-function matchDeclarationRule(lToken: Token, rToken: Token) {
-  if (lToken.type === TokenType.TYPE && rToken.type === TokenType.IDENTIFIER) {
+function matchDeclarationRule(baseToken: Token, loohaheadToken: Token) {
+  if (baseToken.type === TokenType.TYPE && loohaheadToken.type === TokenType.IDENTIFIER) {
     return true;
   }
   return false;

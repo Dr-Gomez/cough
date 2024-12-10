@@ -144,7 +144,6 @@ function handleOperator(source: string, index: number): TokenWrapper {
       type: TokenType.UNA_OPERATOR,
       value: value,
     };
-    index++;
     return { token, index: index };
   }
 
@@ -153,7 +152,6 @@ function handleOperator(source: string, index: number): TokenWrapper {
       type: TokenType.BIN_OPERATOR,
       value: value,
     };
-    index++;
     return { token, index: index };
   }
 
