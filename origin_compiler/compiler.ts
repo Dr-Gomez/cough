@@ -7,6 +7,7 @@ import log from "./logs/log.ts";
 const sourceCode = `
 
 int num;
+num++;
 
 `;
 
@@ -14,3 +15,4 @@ let TokenQueue: Array<Token> = handleTokens(sourceCode);
 let NodeTree: CodeBlockNode = handleNode(TokenQueue);
 
 log.showLogs();
+console.log(JSON.parse(JSON.stringify(NodeTree)))

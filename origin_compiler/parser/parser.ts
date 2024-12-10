@@ -2,17 +2,24 @@ import { Token, TokenType } from "../lexer/lexer.ts";
 
 import {
   matchBinaryOperationRule,
+  matchUnaryOperationRule,
+  matchIncrementRule,
+  matchDecrementRule,
+  matchNegationRule,
   matchDeclarationRule,
   matchBoolRule,
   matchNumberRule,
   matchStringRule,
   matchTerminatorRule,
   matchVariableRule,
+  matchEOFRule,
 } from "./rules.ts";
 
 import {
   Node,
   ErrorNode,
+  StartNode,
+  EndNode,
   VariableNode,
   TerminatorNode,
   BoolLiteralNode,
@@ -21,6 +28,7 @@ import {
   DeclarationNode,
   IncrementNode,
   DecrementNode,
+  NegationNode,
   AssignmentNode,
   AdditionNode,
   SubtractionNode,
@@ -35,6 +43,17 @@ import log from "../logs/log.ts";
 interface NodeWrapper {
   node: Node | null;
   index: number;
+}
+
+function handleEOF(tokens: Token[], index: number): NodeWrapper {
+  if (matchEOFRule(tokens[index])) {
+    return {
+      node: new TerminatorNode(),
+      index: index
+    }
+  }
+
+  return { node: null, index }
 }
 
 function handleTerminatorNode(tokens: Token[], index: number): NodeWrapper {
@@ -93,7 +112,7 @@ function handleVariableNode(tokens: Token[], index: number): NodeWrapper {
   return { node: null, index };
 }
 
-const varTable = new Set()
+const varTable = new Map()
 
 function handleDeclarationNode(tokens: Token[], index: number): NodeWrapper {
   if (
@@ -101,7 +120,7 @@ function handleDeclarationNode(tokens: Token[], index: number): NodeWrapper {
   ) {
     const variable = new VariableNode(tokens[index + 1].value);
     
-    if (varTable.has(variable)) {
+    if (varTable.has(tokens[index + 1].value)) {
       return {
         node: new ErrorNode(
           `${tokens[index + 1].value} being declared again`,
@@ -110,7 +129,7 @@ function handleDeclarationNode(tokens: Token[], index: number): NodeWrapper {
       };
     }
     
-    varTable.add(variable)
+    varTable.set(tokens[index + 1].value, variable)
 
     return {
       node: new DeclarationNode(
@@ -124,10 +143,31 @@ function handleDeclarationNode(tokens: Token[], index: number): NodeWrapper {
   return { node: null, index };
 }
 
-function handleBinaryOperation(tokens: Token[], index: number) {
-  if(matchBinaryOperationRule(tokens[index + 1])) {
-    console.log("ruled")
+function handleUnaryOperator(tokens: Token[], index: number): NodeWrapper {
+  if (matchUnaryOperationRule(tokens[index + 1])) {
+    if (matchIncrementRule(tokens[index + 1])) {
+      return {
+        node: new IncrementNode(varTable.get(tokens[index].value)),
+        index: index + 2
+      }
+    }
+
+    if (matchDecrementRule(tokens[index + 1])) {
+      return {
+        node: new DecrementNode(varTable.get(tokens[index].value)),
+        index: index + 2
+      }
+    }
+
+    if (matchNegationRule(tokens[index + 1])) {
+      return {
+        node: new NegationNode(varTable.get(tokens[index].value)),
+        index: index + 2
+      }
+    }
   }
+
+  return { node: null, index }
 }
 
 function checkBorrower(borrower: NodeWrapper): boolean {
@@ -137,7 +177,9 @@ function checkBorrower(borrower: NodeWrapper): boolean {
 // Handler functions need to go from highest scope to lowest
 
 const instrQueue: Array<Function> = [
+  handleEOF,
   handleTerminatorNode,
+  handleUnaryOperator,
   handleDeclarationNode,
   handleStringLiteralNode,
   handleNumberLiteralNode,
@@ -166,9 +208,11 @@ export default function handleNodes(tokens: Array<Token>) {
   log.startLog("NODE");
 
   let index = 1;
-  let jumpNode: NodeWrapper = { node: null, index: index };
-
   let nodeQueue: Array<Node> = [];
+
+  let jumpNode: NodeWrapper = { node: new StartNode(), index: index };
+  nodeQueue.push(jumpNode.node!)
+  log.logAppend(jumpNode.node!.type, null)
 
   while (tokens[index].type !== TokenType.EOF) {
     jumpNode = handleNode(tokens, index);

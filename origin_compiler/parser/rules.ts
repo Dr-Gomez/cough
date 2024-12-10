@@ -77,6 +77,13 @@ function matchVariableRule(token: Token) {
   return false;
 }
 
+function matchEOFRule(tokens: Token) {
+  if (tokens.type === TokenType.EOF) {
+    return true;
+  }
+  return false
+}
+
 export {
   matchBinaryOperationRule,
   matchUnaryOperationRule,
@@ -89,4 +96,5 @@ export {
   matchStringRule,
   matchTerminatorRule,
   matchVariableRule,
+  matchEOFRule,
 };
