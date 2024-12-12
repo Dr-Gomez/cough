@@ -6,10 +6,7 @@ import log from "./logs/log.ts";
 
 const sourceCode = `
 
-int num;
-num++;
-num~~;
-num--;
+int num = 5;
 
 `;
 

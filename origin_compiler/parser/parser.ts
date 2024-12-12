@@ -190,6 +190,11 @@ function handleUnaryOperator(tokens: Token[], index: number): NodeWrapper {
   return { node: null, index };
 }
 
+function handleBinaryOperator(tokens: Token[], index: number) {
+  if (matchBinaryOperationRule(tokens[index + 1])) {
+  }
+}
+
 function checkBorrower(borrower: NodeWrapper): boolean {
   return borrower.node !== null;
 }
