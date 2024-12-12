@@ -157,7 +157,7 @@ function handleVariableNode(tokens: Token[], index: number): NodeWrapper {
       }
     }
 
-    return { node: variable, index: index + 1 };
+    return { node: new VariableNode(tokens[index].value), index: index + 1 };
   }
 
   return { node: null, index };
