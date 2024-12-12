@@ -156,6 +156,21 @@ class DivisionNode extends Node {
 
 // Variable Nodes
 
+
+// Control Flow Nodes
+
+class DeclarationNode extends Node {
+  type = "Declaration";
+  litType: "bool" | "int" | "float" | "char" | "array";
+  
+  constructor(
+    litType: "bool" | "int" | "float" | "char" | "array",
+  ) {
+    super();
+    this.litType = litType;
+  }
+}
+
 class VariableNode extends Node {
   type = "Variable";
   name: string;
@@ -163,23 +178,6 @@ class VariableNode extends Node {
   constructor(name: string) {
     super();
     this.name = name;
-  }
-}
-
-// Control Flow Nodes
-
-class DeclarationNode extends Node {
-  type = "Declaration";
-  litType: "bool" | "int" | "float" | "char" | "array";
-  variable: VariableNode;
-
-  constructor(
-    litType: "bool" | "int" | "float" | "char" | "array",
-    variable: VariableNode,
-  ) {
-    super();
-    this.litType = litType;
-    this.variable = variable;
   }
 }
 

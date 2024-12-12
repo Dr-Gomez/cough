@@ -101,13 +101,6 @@ function handleBoolLiteralNode(tokens: Token[], index: number): NodeWrapper {
   return { node: null, index };
 }
 
-function handleVariableNode(tokens: Token[], index: number): NodeWrapper {
-  if (matchVariableRule(tokens[index])) {
-    return { node: new VariableNode(tokens[index].value), index: index + 1 };
-  }
-
-  return { node: null, index };
-}
 
 const varTable = new Map();
 
@@ -115,8 +108,18 @@ function handleDeclarationNode(tokens: Token[], index: number): NodeWrapper {
   if (
     matchDeclarationRule(tokens[index], tokens[index + 1])
   ) {
-    const variable = new VariableNode(tokens[index + 1].value);
-
+    
+    const declaration: DeclarationNode = new DeclarationNode(
+      tokens[index].value as unknown as
+        | "bool"
+        | "int"
+        | "float"
+        | "char"
+        | "array",
+    ) 
+    
+    const variable: VariableNode = new VariableNode(tokens[index + 1].value);
+    
     if (varTable.has(tokens[index + 1].value)) {
       return {
         node: new ErrorNode(
@@ -125,21 +128,36 @@ function handleDeclarationNode(tokens: Token[], index: number): NodeWrapper {
         index: index,
       };
     }
-
+    
     varTable.set(tokens[index + 1].value, variable);
-
+    
     return {
-      node: new DeclarationNode(
-        tokens[index].value as unknown as
-          | "bool"
-          | "int"
-          | "float"
-          | "char"
-          | "array",
-        variable,
-      ),
+      node: declaration,
       index: index + 2,
     };
+  }
+  
+  return { node: null, index };
+}
+
+function handleVariableNode(tokens: Token[], index: number): NodeWrapper {
+
+  
+  
+  if (matchVariableRule(tokens[index])) {
+    
+    const variable = varTable.get(tokens[index])
+    
+    if(typeof variable === "undefined"){
+      return {
+        node: new ErrorNode(
+          `${tokens[index + 1].value} is being used before being declared`
+        ),
+        index: index
+      }
+    }
+
+    return { node: variable, index: index + 1 };
   }
 
   return { node: null, index };
