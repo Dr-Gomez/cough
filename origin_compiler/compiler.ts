@@ -8,6 +8,8 @@ const sourceCode = `
 
 int num;
 num++;
+num~~;
+num--;
 
 `;
 

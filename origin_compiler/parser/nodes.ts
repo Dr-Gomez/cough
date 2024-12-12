@@ -88,7 +88,7 @@ class NegationNode extends Node {
 
   constructor(variable: VariableNode) {
     super();
-    this.variable;
+    this.variable = variable;
   }
 }
 
