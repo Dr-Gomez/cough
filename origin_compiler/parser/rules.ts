@@ -166,5 +166,13 @@ export {
   matchStringRule,
   matchTerminatorRule,
   matchUnaryOperationRule,
+  matchAdditionRule,
+  matchSubtractionRule,
+  matchMultiplicationRule,
+  matchDivisionRule,
+  matchModulationRule,
+  matchANDRule,
+  matchORRule,
+  matchNOTRule,
   matchVariableRule,
 };
