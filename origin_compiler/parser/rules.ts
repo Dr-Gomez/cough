@@ -13,35 +13,35 @@ function matchAdditionRule(token: Token) {
   if (token.value === "+") {
     return true;
   }
-  return false
+  return false;
 }
 
 function matchSubtractionRule(token: Token) {
   if (token.value === "-") {
     return true;
   }
-  return false
+  return false;
 }
 
 function matchMultiplicationRule(token: Token) {
   if (token.value === "*") {
     return true;
   }
-  return false
+  return false;
 }
 
 function matchDivisionRule(token: Token) {
   if (token.value === "/") {
     return true;
   }
-  return false
+  return false;
 }
 
 function matchModulationRule(token: Token) {
   if (token.value === "%") {
     return true;
   }
-  return false
+  return false;
 }
 
 // Logical
@@ -50,16 +50,15 @@ function matchANDRule(token: Token) {
   if (token.value === "&") {
     return true;
   }
-  return false
+  return false;
 }
 
 function matchORRule(token: Token) {
   if (token.value === "|") {
     return true;
   }
-  return false
+  return false;
 }
-
 
 // Unary Operators
 
@@ -155,24 +154,24 @@ function matchEOFRule(tokens: Token) {
 }
 
 export {
+  matchAdditionRule,
+  matchANDRule,
   matchBinaryOperationRule,
   matchBoolRule,
   matchDeclarationRule,
   matchDecrementRule,
+  matchDivisionRule,
   matchEOFRule,
   matchIncrementRule,
+  matchModulationRule,
+  matchMultiplicationRule,
   matchNegationRule,
+  matchNOTRule,
   matchNumberRule,
+  matchORRule,
   matchStringRule,
+  matchSubtractionRule,
   matchTerminatorRule,
   matchUnaryOperationRule,
-  matchAdditionRule,
-  matchSubtractionRule,
-  matchMultiplicationRule,
-  matchDivisionRule,
-  matchModulationRule,
-  matchANDRule,
-  matchORRule,
-  matchNOTRule,
   matchVariableRule,
 };

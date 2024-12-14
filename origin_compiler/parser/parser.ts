@@ -108,14 +108,12 @@ function handleBoolLiteralNode(tokens: Token[], index: number): NodeWrapper {
   return { node: null, index };
 }
 
-
 const varTable = new Map();
 
 function handleDeclarationNode(tokens: Token[], index: number): NodeWrapper {
   if (
     matchDeclarationRule(tokens[index], tokens[index + 1])
   ) {
-    
     const declaration: DeclarationNode = new DeclarationNode(
       tokens[index].value as unknown as
         | "bool"
@@ -123,10 +121,10 @@ function handleDeclarationNode(tokens: Token[], index: number): NodeWrapper {
         | "float"
         | "char"
         | "array",
-    ) 
-    
+    );
+
     const variable: VariableNode = new VariableNode(tokens[index + 1].value);
-    
+
     if (varTable.has(tokens[index + 1].value)) {
       return {
         node: new ErrorNode(
@@ -135,33 +133,29 @@ function handleDeclarationNode(tokens: Token[], index: number): NodeWrapper {
         index: index,
       };
     }
-    
+
     varTable.set(tokens[index + 1].value, variable);
-    
+
     return {
       node: declaration,
       index: index + 2,
     };
   }
-  
+
   return { node: null, index };
 }
 
 function handleVariableNode(tokens: Token[], index: number): NodeWrapper {
-
-  
-  
   if (matchVariableRule(tokens[index])) {
-    
-    const variable = varTable.get(tokens[index])
-    
-    if(typeof variable === "undefined"){
+    const variable = varTable.get(tokens[index]);
+
+    if (typeof variable === "undefined") {
       return {
         node: new ErrorNode(
-          `${tokens[index + 1].value} is being used before being declared`
+          `${tokens[index + 1].value} is being used before being declared`,
         ),
-        index: index
-      }
+        index: index,
+      };
     }
 
     return { node: new VariableNode(tokens[index].value), index: index + 1 };
@@ -200,31 +194,24 @@ function handleUnaryOperator(tokens: Token[], index: number): NodeWrapper {
 function handleBinaryOperator(tokens: Token[], index: number) {
   if (matchBinaryOperationRule(tokens[index + 1])) {
     if (matchAdditionRule(tokens[index + 1])) {
-      
     }
 
     if (matchSubtractionRule(tokens[index + 1])) {
-      
     }
 
     if (matchMultiplicationRule(tokens[index + 1])) {
-      
     }
 
     if (matchDivisionRule(tokens[index + 1])) {
-      
     }
 
     if (matchModulationRule(tokens[index + 1])) {
-      
     }
 
     if (matchANDRule(tokens[index + 1])) {
-
     }
 
     if (matchORRule(tokens[index + 1])) {
-
     }
   }
 }

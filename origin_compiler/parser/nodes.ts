@@ -155,7 +155,7 @@ class DivisionNode extends Node {
 }
 
 class ANDNode extends Node {
-  type = "AND"
+  type = "AND";
   left: Node;
   right: Node;
 
@@ -166,9 +166,8 @@ class ANDNode extends Node {
   }
 }
 
-
 class ORNode extends Node {
-  type = "AND"
+  type = "AND";
   left: Node;
   right: Node;
 
@@ -184,7 +183,7 @@ class ORNode extends Node {
 class DeclarationNode extends Node {
   type = "Declaration";
   litType: "bool" | "int" | "float" | "char" | "array";
-  
+
   constructor(
     litType: "bool" | "int" | "float" | "char" | "array",
   ) {
@@ -196,7 +195,7 @@ class DeclarationNode extends Node {
 class VariableNode extends Node {
   type = "Variable";
   name: string;
-  
+
   constructor(name: string) {
     super();
     this.name = name;
@@ -206,7 +205,7 @@ class VariableNode extends Node {
 class CodeBlockNode extends Node {
   type = "CodeBlock";
   statements: Node[];
-  
+
   constructor(statements: Node[]) {
     super();
     this.statements = statements;
@@ -242,13 +241,13 @@ export {
   EndNode,
   ErrorNode,
   IncrementNode,
+  MethodNode,
   MultiplicationNode,
   NegationNode,
   Node,
   NumberLiteralNode,
   StartNode,
   StringLiteralNode,
-  MethodNode,
   SubtractionNode,
   TerminatorNode,
   VariableNode,

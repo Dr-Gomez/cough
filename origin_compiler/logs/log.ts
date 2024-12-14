@@ -70,9 +70,7 @@ class log {
 
     this.endLog("TOKEN");
     this.logArr.push(
-      `${this.timer()}: ERROR: cannot recognize character "${
-        text[index]
-      }" found at [line: ${errPos.line}, pos: ${errPos.char}] of your code`,
+      `${this.timer()}: ERROR: cannot recognize character "${text[index]}" found at [line: ${errPos.line}, pos: ${errPos.char}] of your code`,
     );
   }
 
@@ -98,9 +96,7 @@ class log {
 
     this.endLog(type);
     this.logArr.push(
-      `${this.timer()}: SUCCESS: Code was successfully ${
-        type + "NIZED"
-      } in ${result}.`,
+      `${this.timer()}: SUCCESS: Code was successfully ${type + "NIZED"} in ${result}.`,
     );
     this.separateLogs();
   }

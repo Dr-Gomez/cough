@@ -57,14 +57,4 @@ function isPunctuator(char: string): boolean {
   return [",", ";", ":", "(", ")", "{", "}", "[", "]", "@"].includes(char);
 }
 
-export {
-  isAlpha,
-  isBinaryOperator,
-  isBool,
-  isDigit,
-  isKeyword,
-  isOperatorChar,
-  isPunctuator,
-  isType,
-  isUnaryOperator,
-};
+export { isAlpha, isBinaryOperator, isBool, isDigit, isKeyword, isOperatorChar, isPunctuator, isType, isUnaryOperator };

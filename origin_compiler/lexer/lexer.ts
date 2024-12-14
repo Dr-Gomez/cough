@@ -1,16 +1,6 @@
 import log from "../logs/log.ts";
 
-import {
-  isAlpha,
-  isBinaryOperator,
-  isBool,
-  isDigit,
-  isKeyword,
-  isOperatorChar,
-  isPunctuator,
-  isType,
-  isUnaryOperator,
-} from "./detection.ts";
+import { isAlpha, isBinaryOperator, isBool, isDigit, isKeyword, isOperatorChar, isPunctuator, isType, isUnaryOperator } from "./detection.ts";
 
 export enum TokenType {
   EOF,
