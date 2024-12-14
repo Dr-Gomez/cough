@@ -1,15 +1,22 @@
 import { Token, TokenType } from "../lexer/lexer.ts";
 
 import {
+  matchAdditionRule,
+  matchANDRule,
   matchBinaryOperationRule,
   matchBoolRule,
   matchDeclarationRule,
   matchDecrementRule,
+  matchDivisionRule,
   matchEOFRule,
   matchIncrementRule,
+  matchModulationRule,
+  matchMultiplicationRule,
   matchNegationRule,
   matchNumberRule,
+  matchORRule,
   matchStringRule,
+  matchSubtractionRule,
   matchTerminatorRule,
   matchUnaryOperationRule,
   matchVariableRule,
@@ -192,6 +199,33 @@ function handleUnaryOperator(tokens: Token[], index: number): NodeWrapper {
 
 function handleBinaryOperator(tokens: Token[], index: number) {
   if (matchBinaryOperationRule(tokens[index + 1])) {
+    if (matchAdditionRule(tokens[index + 1])) {
+      
+    }
+
+    if (matchSubtractionRule(tokens[index + 1])) {
+      
+    }
+
+    if (matchMultiplicationRule(tokens[index + 1])) {
+      
+    }
+
+    if (matchDivisionRule(tokens[index + 1])) {
+      
+    }
+
+    if (matchModulationRule(tokens[index + 1])) {
+      
+    }
+
+    if (matchANDRule(tokens[index + 1])) {
+
+    }
+
+    if (matchORRule(tokens[index + 1])) {
+
+    }
   }
 }
 

@@ -119,7 +119,7 @@ class AdditionNode extends Node {
 }
 
 class SubtractionNode extends Node {
-  type = "Addition";
+  type = "Subtraction";
   left: Node;
   right: Node;
 
@@ -131,7 +131,7 @@ class SubtractionNode extends Node {
 }
 
 class MultiplicationNode extends Node {
-  type = "Addition";
+  type = "Multiplication";
   left: Node;
   right: Node;
 
@@ -143,7 +143,32 @@ class MultiplicationNode extends Node {
 }
 
 class DivisionNode extends Node {
-  type = "Addition";
+  type = "Division";
+  left: Node;
+  right: Node;
+
+  constructor(left: Node, right: Node) {
+    super();
+    this.left = left;
+    this.right = right;
+  }
+}
+
+class ANDNode extends Node {
+  type = "AND"
+  left: Node;
+  right: Node;
+
+  constructor(left: Node, right: Node) {
+    super();
+    this.left = left;
+    this.right = right;
+  }
+}
+
+
+class ORNode extends Node {
+  type = "AND"
   left: Node;
   right: Node;
 
@@ -155,9 +180,6 @@ class DivisionNode extends Node {
 }
 
 // Variable Nodes
-
-
-// Control Flow Nodes
 
 class DeclarationNode extends Node {
   type = "Declaration";
@@ -174,7 +196,7 @@ class DeclarationNode extends Node {
 class VariableNode extends Node {
   type = "Variable";
   name: string;
-
+  
   constructor(name: string) {
     super();
     this.name = name;
@@ -184,19 +206,21 @@ class VariableNode extends Node {
 class CodeBlockNode extends Node {
   type = "CodeBlock";
   statements: Node[];
-
+  
   constructor(statements: Node[]) {
     super();
     this.statements = statements;
   }
 }
 
+// Control Flow Nodes
+
 class MethodNode extends Node {
   type = "Method";
-  parameters: Node[];
+  parameters: VariableNode[];
   block: CodeBlockNode;
 
-  constructor(parameters: Node[], block: CodeBlockNode) {
+  constructor(parameters: VariableNode[], block: CodeBlockNode) {
     super();
     this.parameters = parameters;
     this.block = block;
@@ -224,6 +248,7 @@ export {
   NumberLiteralNode,
   StartNode,
   StringLiteralNode,
+  MethodNode,
   SubtractionNode,
   TerminatorNode,
   VariableNode,
