@@ -1,60 +1,51 @@
 import { Token, TokenType } from "../lexer/lexer.ts";
 
-function matchBinaryOperationRule(token: Token) {
-  if (token.type === TokenType.BIN_OPERATOR) {
-    return true;
-  }
-  return false;
-}
-
-// Arithmetic
+//Binary Operators
 
 function matchAdditionRule(token: Token) {
-  if (token.value === "+") {
+  if (token.type === TokenType.BIN_OPERATOR && token.value === "+") {
     return true;
   }
   return false;
 }
 
 function matchSubtractionRule(token: Token) {
-  if (token.value === "-") {
+  if (token.type === TokenType.BIN_OPERATOR && token.value === "-") {
     return true;
   }
   return false;
 }
 
 function matchMultiplicationRule(token: Token) {
-  if (token.value === "*") {
+  if (token.type === TokenType.BIN_OPERATOR && token.value === "*") {
     return true;
   }
   return false;
 }
 
 function matchDivisionRule(token: Token) {
-  if (token.value === "/") {
+  if (token.type === TokenType.BIN_OPERATOR && token.value === "/") {
     return true;
   }
   return false;
 }
 
 function matchModulationRule(token: Token) {
-  if (token.value === "%") {
+  if (token.type === TokenType.BIN_OPERATOR && token.value === "%") {
     return true;
   }
   return false;
 }
 
-// Logical
-
 function matchANDRule(token: Token) {
-  if (token.value === "&") {
+  if (token.type === TokenType.BIN_OPERATOR && token.value === "&") {
     return true;
   }
   return false;
 }
 
 function matchORRule(token: Token) {
-  if (token.value === "|") {
+  if (token.type === TokenType.BIN_OPERATOR && token.value === "|") {
     return true;
   }
   return false;
@@ -62,40 +53,29 @@ function matchORRule(token: Token) {
 
 // Unary Operators
 
-function matchUnaryOperationRule(token: Token) {
-  if (token.type === TokenType.UNA_OPERATOR) {
-    return true;
-  }
-  return false;
-}
-
-// Arithmetic
-
 function matchIncrementRule(token: Token) {
-  if (token.value === "++") {
+  if (token.type === TokenType.UNA_OPERATOR && token.value === "++") {
     return true;
   }
   return false;
 }
 
 function matchDecrementRule(token: Token) {
-  if (token.value === "--") {
+  if (token.type === TokenType.UNA_OPERATOR && token.value === "--") {
     return true;
   }
   return false;
 }
 
-// Logical
-
 function matchNOTRule(token: Token) {
-  if (token.value === "!!") {
+  if (token.type === TokenType.UNA_OPERATOR && token.value === "!!") {
     return true;
   }
   return false;
 }
 
 function matchNegationRule(token: Token) {
-  if (token.value === "~~") {
+  if (token.type === TokenType.UNA_OPERATOR && token.value === "~~") {
     return true;
   }
   return false;
@@ -156,7 +136,6 @@ function matchEOFRule(tokens: Token) {
 export {
   matchAdditionRule,
   matchANDRule,
-  matchBinaryOperationRule,
   matchBoolRule,
   matchDeclarationRule,
   matchDecrementRule,
@@ -172,6 +151,5 @@ export {
   matchStringRule,
   matchSubtractionRule,
   matchTerminatorRule,
-  matchUnaryOperationRule,
   matchVariableRule,
 };
