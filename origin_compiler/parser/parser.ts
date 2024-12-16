@@ -3,12 +3,15 @@ import { Token, TokenType } from "../lexer/lexer.ts";
 import {
   matchAdditionRule,
   matchANDRule,
+  matchAssignmentRule,
   matchBoolRule,
   matchDeclarationRule,
   matchDecrementRule,
+  matchDelocationRule,
   matchDivisionRule,
   matchEOFRule,
   matchIncrementRule,
+  matchInverseRule,
   matchModulationRule,
   matchMultiplicationRule,
   matchNegationRule,
@@ -17,6 +20,7 @@ import {
   matchStringRule,
   matchSubtractionRule,
   matchTerminatorRule,
+  matchTypeRule,
   matchVariableRule,
 } from "./rules.ts";
 
@@ -27,10 +31,13 @@ import {
   CodeBlockNode,
   DeclarationNode,
   DecrementNode,
+  DelocationNode,
   DivisionNode,
   EndNode,
   ErrorNode,
   IncrementNode,
+  InverseNode,
+  ModulusNode,
   MultiplicationNode,
   NegationNode,
   Node,
@@ -39,10 +46,16 @@ import {
   StringLiteralNode,
   SubtractionNode,
   TerminatorNode,
+  TypeLiteralNode,
   VariableNode,
 } from "./nodes.ts";
 
 import log from "../logs/log.ts";
+
+interface AnyWrapper {
+  node: Array<any> | null;
+  index: number;
+}
 
 interface NodeWrapper {
   node: Node | null;
@@ -192,7 +205,7 @@ interface NodeWrapper {
 // function handleBinaryOperator(tokens: Token[], index: number) {
 //   if (matchBinaryOperationRule(tokens[index + 1])) {
 //     if (matchAdditionRule(tokens[index + 1])) {
-      
+
 //     }
 
 //     if (matchSubtractionRule(tokens[index + 1])) {
@@ -215,14 +228,11 @@ interface NodeWrapper {
 //   }
 // }
 
-// function checkBorrower(borrower: NodeWrapper): boolean {
-//   return borrower.node !== null;
-// }
 
 // Handler functions need to go from highest scope to lowest
 
 // const instrQueue: Array<Function> = [
-//   handleEOF,
+  //   handleEOF,
 //   handleTerminatorNode,
 //   handleUnaryOperator,
 //   handleDeclarationNode,
@@ -233,49 +243,165 @@ interface NodeWrapper {
 // ];
 
 // function handleNode(
-//   tokens: Array<Token>,
-//   index: number,
-// ) {
-//   let borrower: NodeWrapper;
-
+  //   tokens: Array<Token>,
+  //   index: number,
+  // ) {
+    //   let borrower: NodeWrapper;
+    
 //   for (let i = 0; i < instrQueue.length; i++) {
-//     borrower = instrQueue[i](tokens, index);
-//     if (checkBorrower(borrower)) {
-//       return borrower;
-//     }
-//   }
+  //     borrower = instrQueue[i](tokens, index);
+  //     if (checkBorrower(borrower)) {
+    //       return borrower;
+    //     }
+    //   }
+    
+    //   const errNode = new ErrorNode("no syntax pattern found matching token");
+    //   return { node: errNode, index };
+    // }
 
-//   const errNode = new ErrorNode("no syntax pattern found matching token");
-//   return { node: errNode, index };
-// }
+const BinaryMatches = [
+  matchAssignmentRule,
+  matchAdditionRule,
+  matchSubtractionRule,
+  matchMultiplicationRule,
+  matchDivisionRule,
+  matchModulationRule,
+];
 
-// export default function handleNodes(tokens: Array<Token>) {
-//   log.startLog("NODE");
+const UnaryMatches = [
+  matchIncrementRule,
+  matchDecrementRule,
+  matchInverseRule,
+  matchNegationRule,
+  matchDelocationRule,
+];
 
-//   let index = 1;
-//   let nodeQueue: Array<Node> = [];
+const LiteralMatches = [
+  matchStringRule,
+  matchNumberRule,
+  matchBoolRule,
+  matchTypeRule,
+];
 
-//   let jumpNode: NodeWrapper = { node: new StartNode(), index: index };
-//   nodeQueue.push(jumpNode.node!);
-//   log.logAppend(jumpNode.node!.type, null);
+const AllMatchesQueue = [
+  matchEOFRule,
+  matchTerminatorRule,
+  matchDeclarationRule,
+  ...BinaryMatches,
+  ...UnaryMatches,
+  ...LiteralMatches,
+  matchVariableRule,
+];
 
-//   while (jumpNode.node!.type !== "End") {
-//     jumpNode = handleNode(tokens, index);
+const BinaryNodes = [
+  AssignmentNode,
+  AdditionNode,
+  SubtractionNode,
+  MultiplicationNode,
+  DivisionNode,
+  ModulusNode
+]
 
-//     if (jumpNode.node?.type == "Error") {
-//       const errorNode = jumpNode.node as ErrorNode;
-//       log.logNodeError(`${errorNode.msg}`);
-//       break;
-//     }
+const UnaryNodes = [
+  IncrementNode,
+  DecrementNode,
+  InverseNode,
+  NegationNode,
+  DelocationNode
+]
 
-//     nodeQueue.push(jumpNode.node!);
-//     index = jumpNode.index;
-//     log.logAppend(jumpNode.node!.type, null);
-//   }
+const LiteralNodes = [
+  StringLiteralNode,
+  NumberLiteralNode,
+  BoolLiteralNode,
+  TypeLiteralNode
+]
 
-//   if (jumpNode.node?.type !== "Error") {
-//     log.logSuccess("NODE");
-//   }
+const AllNodes = [
+  EndNode,
+  TerminatorNode,
+  DeclarationNode,
+  ...BinaryNodes,
+  ...UnaryNodes,
+  ...LiteralNodes,
+  VariableNode
+]
 
-//   return new CodeBlockNode(nodeQueue);
-// }
+function handleParameters(tokens: Array<Token>, tokenIndex: number, instrIndex): AnyWrapper {
+  const depth = AllNodes[instrIndex].prototype.constructor.length
+
+  let parameters: Array<any> = []
+  let i = 0;
+
+  for(let primes = 0; primes < LiteralNodes.length; primes++) {
+    if (AllNodes[instrIndex] instanceof LiteralNodes[primes]) {
+      parameters[0] = tokens[tokenIndex].value
+      i++;
+      break;
+    }
+  }
+  
+  for (i; i < depth; i++) {
+    parameters[i] = handleNode(tokens, tokenIndex + 1)
+  }
+
+  return {node: parameters, index: i}
+}
+
+function handleNode(tokens: Array<Token>, index: number): NodeWrapper {
+  for(let i = 0; i < AllMatchesQueue.length; i++) {
+    if(AllMatchesQueue[i](tokens[index], tokens[index + 1])) {
+      const parameters = handleParameters(tokens, index, i)
+      console.log(parameters.node!.length)
+      let node: Node
+      switch (parameters.node!.length) {
+        case undefined:
+          //@ts-ignore
+          node = new AllNodes[i]();
+          break;
+        case 1:
+          //@ts-ignore
+          node = new AllNodes[i](parameters.node![0]);
+          break;
+        case 2:
+          //@ts-ignore
+          node = new AllNodes[i](parameters.node![0], parameters.node![1]);
+          break;
+      }
+      return {node: node!, index: parameters.index}
+    };
+  }
+
+  return {node: new ErrorNode("no logic pattern found matching your code"), index: index}
+}
+
+export default function handleNodes(tokens: Array<Token>) {
+  log.startLog("NODE");
+  
+  let index = 1;
+  let nodeQueue: Array<Node> = [];
+  
+  let jumpNode: NodeWrapper = { node: new StartNode(), index: index };
+  nodeQueue.push(jumpNode.node!);
+  log.logAppend(jumpNode.node!.type, null);
+
+  while (jumpNode.node!.type !== "End") {
+    jumpNode = handleNode(tokens, index);
+
+    if (jumpNode.node?.type == "Error") {
+      const errorNode = jumpNode.node as ErrorNode;
+      log.logNodeError(`${errorNode.msg}`);
+      break;
+    }
+
+    nodeQueue.push(jumpNode.node!);
+    index = jumpNode.index;
+    log.logAppend(jumpNode.node!.type, null);
+  }
+
+  if (jumpNode.node?.type !== "Error") {
+    log.logSuccess("NODE");
+  }
+
+  return new CodeBlockNode(nodeQueue);
+}

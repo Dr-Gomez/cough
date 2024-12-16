@@ -34,9 +34,9 @@ class NumberLiteralNode extends Node {
   type = "NumberLiteral";
   value: number;
 
-  constructor(value: number) {
+  constructor(value: string) {
     super();
-    this.value = value;
+    this.value = Number.parseFloat(value);
   }
 }
 
@@ -54,9 +54,23 @@ class BoolLiteralNode extends Node {
   type = "BoolLiteral";
   value: boolean;
 
-  constructor(value: boolean) {
+  constructor(value: string) {
     super();
-    this.value = value;
+    if (value == "true") {
+      this.value = true
+    } else {
+      this.value = false
+    }
+  }
+}
+
+class TypeLiteralNode extends Node {
+  type = "TypeLiteral";
+  litType: "bool" | "int" | "float" | "char" | "array";
+
+  constructor(litType: string) {
+    super();
+    this.litType = litType as "bool" | "int" | "float" | "char" | "array"
   }
 }
 
@@ -83,6 +97,26 @@ class DecrementNode extends Node {
 }
 
 class NegationNode extends Node {
+  type = "Negation";
+  variable: VariableNode;
+
+  constructor(variable: VariableNode) {
+    super();
+    this.variable = variable;
+  }
+}
+
+class InverseNode extends Node {
+  type = "Negation";
+  variable: VariableNode;
+
+  constructor(variable: VariableNode) {
+    super();
+    this.variable = variable;
+  }
+}
+
+class DelocationNode extends Node {
   type = "Negation";
   variable: VariableNode;
 
@@ -154,6 +188,18 @@ class DivisionNode extends Node {
   }
 }
 
+class ModulusNode extends Node {
+  type = "Modulus";
+  left: Node;
+  right: Node;
+
+  constructor(left: Node, right: Node) {
+    super();
+    this.left = left;
+    this.right = right;
+  }
+}
+
 class ANDNode extends Node {
   type = "AND";
   left: Node;
@@ -182,10 +228,10 @@ class ORNode extends Node {
 
 class DeclarationNode extends Node {
   type = "Declaration";
-  litType: "bool" | "int" | "float" | "char" | "array";
+  litType: TypeLiteralNode;
 
   constructor(
-    litType: "bool" | "int" | "float" | "char" | "array",
+    litType: TypeLiteralNode,
   ) {
     super();
     this.litType = litType;
@@ -232,20 +278,26 @@ class TerminatorNode extends Node {
 
 export {
   AdditionNode,
+  ANDNode,
   AssignmentNode,
   BoolLiteralNode,
   CodeBlockNode,
   DeclarationNode,
   DecrementNode,
+  DelocationNode,
   DivisionNode,
   EndNode,
   ErrorNode,
   IncrementNode,
+  TypeLiteralNode,
+  InverseNode,
   MethodNode,
+  ModulusNode,
   MultiplicationNode,
   NegationNode,
   Node,
   NumberLiteralNode,
+  ORNode,
   StartNode,
   StringLiteralNode,
   SubtractionNode,
