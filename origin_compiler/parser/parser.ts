@@ -283,14 +283,18 @@ const LiteralMatches = [
   matchTypeRule,
 ];
 
+const BaseMatches = [
+  matchTerminatorRule,
+  ...LiteralMatches,
+  matchVariableRule
+]
+
 const AllMatchesQueue = [
   matchEOFRule,
-  matchTerminatorRule,
   matchDeclarationRule,
   ...BinaryMatches,
   ...UnaryMatches,
-  ...LiteralMatches,
-  matchVariableRule,
+  ...BaseMatches
 ];
 
 const BinaryNodes = [
@@ -314,48 +318,67 @@ const LiteralNodes = [
   StringLiteralNode,
   NumberLiteralNode,
   BoolLiteralNode,
-  TypeLiteralNode
+  TypeLiteralNode,
 ]
 
-const AllNodes = [
-  EndNode,
+const BaseNodes = [
   TerminatorNode,
-  DeclarationNode,
-  ...BinaryNodes,
-  ...UnaryNodes,
   ...LiteralNodes,
   VariableNode
 ]
 
-function handleParameters(tokens: Array<Token>, tokenIndex: number, instrIndex): AnyWrapper {
-  const depth = AllNodes[instrIndex].prototype.constructor.length
+const AllNodes = [
+  EndNode,
+  DeclarationNode,
+  ...BinaryNodes,
+  ...UnaryNodes,
+  ...BaseNodes
+]
 
-  let parameters: Array<any> = []
+let NodeDepths: Array<Node> = [];
+
+function handleParameters(tokens: Array<Token>, tokenIndex: number, instrIndex): AnyWrapper {
+  const argNum = AllNodes[instrIndex].prototype.constructor.length
+
+  let parameters: Array<any | Node> = []
   let i = 0;
 
-  for(let primes = 0; primes < LiteralNodes.length; primes++) {
-    if (AllNodes[instrIndex] instanceof LiteralNodes[primes]) {
+  for(let primes = 0; primes < BaseNodes.length; primes++) {
+    if (AllNodes[instrIndex] == BaseNodes[primes]) {
       parameters[0] = tokens[tokenIndex].value
       i++;
+      tokenIndex++;
       break;
     }
   }
   
-  for (i; i < depth; i++) {
-    parameters[i] = handleNode(tokens, tokenIndex + 1)
+  for (let abstracts = 0; abstracts < NodeDepths.length; abstracts++) {
+    if (AllNodes[instrIndex] == NodeDepths[abstracts]) {
+      console.log("Triggered")
+      break;
+    }
   }
 
-  return {node: parameters, index: i}
+  for (i; i < argNum; i++) {
+    
+    const nodeWrapper = handleNode(tokens, tokenIndex + 1)
+    parameters[i] = nodeWrapper.node
+    tokenIndex = nodeWrapper.index;
+  }
+
+  return {node: parameters, index: tokenIndex }
 }
 
 function handleNode(tokens: Array<Token>, index: number): NodeWrapper {
   for(let i = 0; i < AllMatchesQueue.length; i++) {
+    console.log("Attempting to match", tokens[index], "to rule", AllMatchesQueue[i])
     if(AllMatchesQueue[i](tokens[index], tokens[index + 1])) {
+      console.log("Matched", tokens[index], "to rule", AllMatchesQueue[i])
       const parameters = handleParameters(tokens, index, i)
-      console.log(parameters.node!.length)
+
       let node: Node
-      switch (parameters.node!.length) {
-        case undefined:
+      switch (parameters.node!.length) { // Evil manual spreading switch statement
+        case 0:
           //@ts-ignore
           node = new AllNodes[i]();
           break;
@@ -367,7 +390,10 @@ function handleNode(tokens: Array<Token>, index: number): NodeWrapper {
           //@ts-ignore
           node = new AllNodes[i](parameters.node![0], parameters.node![1]);
           break;
-      }
+        default:
+          node = new ErrorNode("parser cannot handle node of more than 2 parameter complexity")
+          break;
+      } 
       return {node: node!, index: parameters.index}
     };
   }

@@ -1,5 +1,5 @@
-class Node {
-  type: string;
+abstract class Node {
+  abstract type: string;
 }
 
 class ErrorNode extends Node {
@@ -229,12 +229,15 @@ class ORNode extends Node {
 class DeclarationNode extends Node {
   type = "Declaration";
   litType: TypeLiteralNode;
+  name: string;
 
   constructor(
     litType: TypeLiteralNode,
+    name: string
   ) {
     super();
     this.litType = litType;
+    this.name = name;
   }
 }
 
