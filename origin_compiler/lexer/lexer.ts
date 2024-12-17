@@ -7,7 +7,8 @@ export enum TokenType {
   SOF,
   IDENTIFIER,
   TYPE,
-  NUMBER,
+  INTNUM,
+  REALNUM,
   STRING,
   BOOL,
   KEYWORD,
@@ -81,10 +82,12 @@ function handleNamespace(source: string, index: number): TokenWrapper {
 
 function handleNumber(source: string, index: number): TokenWrapper {
   const start = index;
+  let float = false;
   while (index < source.length && isDigit(source[index])) {
     index++;
   }
-  if (source[index] === "." && isDigit(source[index + 1])) {
+  if (source[index] === ".") {
+    float = true;
     index++;
     while (index < source.length && isDigit(source[index])) {
       index++;
@@ -92,12 +95,19 @@ function handleNumber(source: string, index: number): TokenWrapper {
   }
   const value = source.slice(start, index);
   if (value) {
-    const token: Token = {
-      type: TokenType.NUMBER,
-      value: value,
-    };
-
-    return { token, index };
+    if (float) {
+      const token: Token = {
+        type: TokenType.REALNUM,
+        value: value,
+      };
+      return { token, index };
+    } else {
+      const token: Token = {
+        type: TokenType.INTNUM,
+        value: value,
+      };
+      return { token, index };
+    }
   }
 
   return { token: null, index };
