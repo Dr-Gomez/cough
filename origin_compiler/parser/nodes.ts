@@ -2,6 +2,10 @@ interface Node {
   node: string
 }
 
+interface MsgNode extends Node {
+  msg: string;
+}
+
 interface BoolLiteralNode extends Node {
   node: "boolean";
   value: boolean;
@@ -9,6 +13,11 @@ interface BoolLiteralNode extends Node {
 
 interface IntegerLiteralNode extends Node {
   node: "integer";
+  value: number;
+}
+
+interface FloatLiteralNode extends Node {
+  node: "float";
   value: number;
 }
 
@@ -28,4 +37,4 @@ interface DeclarationNode extends Node {
   variable: VariableNode;
 }
 
-export { Node, BoolLiteralNode, IntegerLiteralNode, StringLiteralNode, VariableNode, DeclarationNode}
+export { Node, MsgNode, BoolLiteralNode, IntegerLiteralNode, FloatLiteralNode, StringLiteralNode, VariableNode, DeclarationNode }

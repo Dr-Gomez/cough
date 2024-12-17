@@ -1,40 +1,106 @@
 import { Token, TokenType } from "../lexer/lexer.ts";
 
 import log from "../logs/log.ts";
-import { Node, BoolLiteralNode, IntegerLiteralNode, StringLiteralNode } from "./nodes.ts";
+import { Node, BoolLiteralNode, IntegerLiteralNode, StringLiteralNode, FloatLiteralNode, MsgNode } from "./nodes.ts";
 
 interface NodeWrapper {
   node: Node | null;
   index: number;
 }
 
-function handleStr(token: Token, index: number): NodeWrapper {
-  if(token.type == TokenType.NUMBER) {
-    return {node: new NumberLiteralNode(token.value), index: index + 1}
+function handleEOF(tokens: Array<Token>, index: number): NodeWrapper {
+  if(tokens[index].type == TokenType.EOF) {
+    const node: Node = {node: "end"}
+    return {node, index}
   }
   return {node: null, index: index + 1}
 }
 
-function handleInt(token: Token, index: number): NodeWrapper {
-  if(token.type == TokenType.NUMBER) {
-    return {node: new NumberLiteralNode(token.value), index: index + 1}
+function handleTerminator(tokens: Array<Token>, index): NodeWrapper {
+  if(tokens[index].type == TokenType.PUNCTUATOR && tokens[index].value == ";") {
+    const node: Node = {node: "terminator"}
+    return {node, index: index + 1}
   }
   return {node: null, index: index + 1}
 }
 
-function handleBool(token: Token, index: number): NodeWrapper {
-  if(token.type == TokenType.BOOL) {
-    return {node: new BoolLiteralNode(token.value), index: index + 1}
+function handleStr(tokens: Array<Token>, index: number): NodeWrapper {
+  if(tokens[index].type == TokenType.STRING) {
+    const node: StringLiteralNode = {node: "string", value: tokens[index].value}
+    return {node, index}
+  }
+  return {node: null, index: index + 1}
+}
+
+function handleFloat(tokens: Array<Token>, index: number): NodeWrapper {
+  if(tokens[index].type == TokenType.REALNUM) {
+    const value = Number.parseFloat(tokens[index].value)
+    
+    const node: FloatLiteralNode = {
+      node: "float", 
+      value: value
+    }
+    return {node, index: index + 1}
+  }
+  return {node: null, index: index + 1}
+}
+
+function handleInt(tokens: Array<Token>, index: number): NodeWrapper {
+  if(tokens[index].type == TokenType.INTNUM) {
+    const value = Number.parseInt(tokens[index].value)
+
+    const node: IntegerLiteralNode = {
+      node: "integer",
+      value: value
+    }
+    return {node, index: index + 1}
+  }
+  return {node: null, index: index + 1}
+}
+
+function handleBool(tokens: Array<Token>, index: number): NodeWrapper {
+  if(tokens[index].type == TokenType.BOOL) {
+    let value: boolean;
+
+    if(tokens[index].value == "true") {
+      value = true;
+    } else {
+      value = false;
+    }
+    
+    const node: BoolLiteralNode = {
+      node: "boolean",
+      value: value
+    }
+
+    return {node, index: index + 1}
   }
   return {node: null, index: index + 1}
 }
 
 const instrQueue = [
+  handleEOF,
+  handleTerminator,
+  handleStr,
+  handleFloat,
+  handleInt,
   handleBool
 ]
 
-function handleNode(tokens: Array<Token>, index: number) {
+function checkBorrower(borrower: NodeWrapper) {
+  return borrower.node !== null
+}
 
+function handleNode(tokens: Array<Token>, index: number) {
+  for(let i = 0; i < instrQueue.length; i++) {
+    const borrower = instrQueue[i](tokens, index)
+    if(checkBorrower(borrower)) {
+      return borrower;
+    }
+  }
+
+  const node: MsgNode = { node: "error", msg: "No pattern found matching your code"}
+  return { node, index }
 }
 
 export default function handleNodes(tokens: Array<Token>) {
@@ -43,27 +109,26 @@ export default function handleNodes(tokens: Array<Token>) {
   let index = 1;
   let nodeQueue: Array<Node> = [];
   
-  let jumpNode: NodeWrapper = { node: new StartNode(), index: index };
+  let jumpNode: NodeWrapper = { node: {node: "start"}, index: index };
   nodeQueue.push(jumpNode.node!);
-  log.logAppend(jumpNode.node!.type, null);
+  log.logAppend(jumpNode.node!.node, null);
 
-  while (jumpNode.node!.type !== "End") {
+  while (jumpNode.node!.node !== "end") {
     jumpNode = handleNode(tokens, index);
 
-    if (jumpNode.node?.type == "Error") {
-      const errorNode = jumpNode.node as ErrorNode;
-      log.logNodeError(`${errorNode.msg}`);
+    if (jumpNode.node?.node == "error") {
+      log.logNodeError(`${(jumpNode.node as MsgNode).msg}`);
       break;
     }
 
     nodeQueue.push(jumpNode.node!);
     index = jumpNode.index;
-    log.logAppend(jumpNode.node!.type, null);
+    log.logAppend(jumpNode.node!.node, null);
   }
 
-  if (jumpNode.node?.type !== "Error") {
+  if (jumpNode.node?.node !== "error") {
     log.logSuccess("NODE");
   }
 
-  return new CodeBlockNode(nodeQueue);
+  return nodeQueue;
 }
