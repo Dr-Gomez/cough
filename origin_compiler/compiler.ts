@@ -6,8 +6,7 @@ import log from "./logs/log.ts";
 
 const sourceCode = `
 
-12;
-true;
+int hello
 
 `;
 

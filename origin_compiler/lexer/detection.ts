@@ -24,13 +24,13 @@ function isDigit(num: string): boolean {
   return /^[0-9]$/.test(num);
 }
 
-const operatorChars: string[] = ["+", "-", "*", "/", "=", "<", ">", "~"];
+const operatorChars: string[] = ["+", "-", "*", "/", "=", "<", ">", "~", "!"];
 
 function isOperatorChar(char: string): boolean {
   return operatorChars.includes(char);
 }
 
-const unaryOperators: string[] = ["++", "--", "~~"];
+const unaryOperators: string[] = ["++", "--", "~~", "!!"];
 
 function isUnaryOperator(op: string): boolean {
   return unaryOperators.includes(op);
@@ -42,11 +42,10 @@ const binaryOperators: string[] = [
   "*",
   "/",
   "=",
-  "==",
   "<",
-  "<=",
   ">",
-  ">=",
+  "<->",
+  "<-"
 ];
 
 function isBinaryOperator(op: string): boolean {
@@ -58,3 +57,4 @@ function isPunctuator(char: string): boolean {
 }
 
 export { isAlpha, isBinaryOperator, isBool, isDigit, isKeyword, isOperatorChar, isPunctuator, isType, isUnaryOperator };
+export {unaryOperators, binaryOperators}

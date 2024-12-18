@@ -1,7 +1,7 @@
 import { Token, TokenType } from "../lexer/lexer.ts";
 
 import log from "../logs/log.ts";
-import { Node, BoolLiteralNode, IntegerLiteralNode, StringLiteralNode, FloatLiteralNode, MsgNode } from "./nodes.ts";
+import { Node, BoolLiteralNode, IntegerLiteralNode, StringLiteralNode, FloatLiteralNode, MsgNode, VariableNode, TypeLiteralNode, DeclarationNode } from "./nodes.ts";
 
 interface NodeWrapper {
   node: Node | null;
@@ -13,23 +13,56 @@ function handleEOF(tokens: Array<Token>, index: number): NodeWrapper {
     const node: Node = {node: "end"}
     return {node, index}
   }
-  return {node: null, index: index + 1}
+  return {node: null, index}
 }
 
-function handleTerminator(tokens: Array<Token>, index): NodeWrapper {
-  if(tokens[index].type == TokenType.PUNCTUATOR && tokens[index].value == ";") {
-    const node: Node = {node: "terminator"}
-    return {node, index: index + 1}
+function handleType(tokens: Array<Token>, index: number): NodeWrapper {
+  if(tokens[index].type == TokenType.TYPE) {
+    const typeNode: TypeLiteralNode = {
+      node: "type",
+      type: tokens[index].value as TypeLiteralNode["type"]
+    }
+
+    if(tokens[index + 1].type == TokenType.IDENTIFIER) {
+
+      const variableNode: VariableNode = {
+        node: "variable",
+        name: tokens[index + 1].value
+      }
+
+      const declarationNode: DeclarationNode = {
+        node: "declaration",
+        type: typeNode,
+        variable: variableNode
+      }
+
+      if(tokens[index + 2].type == TokenType.BIN_OPERATOR) {
+        if (tokens[index + 2].value == "<->") {
+          declarationNode.readonly = true
+        }
+        
+        if (tokens[index + 2].value == "<-" ) {
+          
+        }
+      }
+
+      return {node: declarationNode, index: index + 2}
+    }
+
+    return {node: typeNode, index: index + 1}
   }
-  return {node: null, index: index + 1}
+  return {node: null, index}
 }
 
 function handleStr(tokens: Array<Token>, index: number): NodeWrapper {
   if(tokens[index].type == TokenType.STRING) {
-    const node: StringLiteralNode = {node: "string", value: tokens[index].value}
-    return {node, index}
+    const node: StringLiteralNode = {
+      node: "string",
+      value: tokens[index].value
+    }
+    return {node, index: index + 1}
   }
-  return {node: null, index: index + 1}
+  return {node: null, index}
 }
 
 function handleFloat(tokens: Array<Token>, index: number): NodeWrapper {
@@ -42,20 +75,20 @@ function handleFloat(tokens: Array<Token>, index: number): NodeWrapper {
     }
     return {node, index: index + 1}
   }
-  return {node: null, index: index + 1}
+  return {node: null, index}
 }
 
 function handleInt(tokens: Array<Token>, index: number): NodeWrapper {
   if(tokens[index].type == TokenType.INTNUM) {
     const value = Number.parseInt(tokens[index].value)
-
+    
     const node: IntegerLiteralNode = {
       node: "integer",
       value: value
     }
     return {node, index: index + 1}
   }
-  return {node: null, index: index + 1}
+  return {node: null, index}
 }
 
 function handleBool(tokens: Array<Token>, index: number): NodeWrapper {
@@ -72,19 +105,31 @@ function handleBool(tokens: Array<Token>, index: number): NodeWrapper {
       node: "boolean",
       value: value
     }
+    return {node, index: index + 1}
+  }
+  return {node: null, index}
+}
+
+function handleVariable(tokens: Array<Token>, index: number): NodeWrapper {
+  if(tokens[index].type === TokenType.IDENTIFIER) {
+    const node: VariableNode = {
+      node: "variable",
+      name: tokens[index].value
+    }
 
     return {node, index: index + 1}
   }
-  return {node: null, index: index + 1}
+  return {node: null, index}
 }
 
 const instrQueue = [
   handleEOF,
-  handleTerminator,
+  handleType,
   handleStr,
   handleFloat,
   handleInt,
-  handleBool
+  handleBool,
+  handleVariable
 ]
 
 function checkBorrower(borrower: NodeWrapper) {
