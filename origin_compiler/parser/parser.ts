@@ -1,7 +1,7 @@
 import { Token, TokenType } from "../lexer/lexer.ts";
 
 import log from "../logs/log.ts";
-import { Node, BoolLiteralNode, IntegerLiteralNode, StringLiteralNode, FloatLiteralNode, MsgNode, VariableNode, TypeLiteralNode, DeclarationNode } from "./nodes.ts";
+import { Node, BoolLiteralNode, IntegerLiteralNode, StringLiteralNode, FloatLiteralNode, MsgNode, VariableNode, TypeLiteralNode, DeclarationNode, ExpressionNode } from "./nodes.ts";
 
 interface NodeWrapper {
   node: Node | null;
@@ -41,8 +41,10 @@ function handleType(tokens: Array<Token>, index: number): NodeWrapper {
           declarationNode.readonly = true
         }
         
-        if (tokens[index + 2].value == "<-" ) {
-          
+        if (tokens[index + 2].value == "<-" || tokens[index + 2].value == "<->") {
+          const expressionNode = handleNode(tokens, index + 3)
+          declarationNode.init = expressionNode.node as ExpressionNode
+          index = expressionNode.index - 2
         }
       }
 

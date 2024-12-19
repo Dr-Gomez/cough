@@ -64,8 +64,7 @@ interface DeclarationNode extends Node {
   type: TypeLiteralNode;
   variable: VariableNode;
   readonly?: true;
-  init?: ExpressionNode
-
+  init?: ExpressionNode;
 }
 
-export { Node, MsgNode, TypeLiteralNode, BoolLiteralNode, IntegerLiteralNode, FloatLiteralNode, StringLiteralNode, VariableNode, DeclarationNode }
+export { Node, MsgNode, TypeLiteralNode, BoolLiteralNode, IntegerLiteralNode, FloatLiteralNode, StringLiteralNode, VariableNode, ExpressionNode, DeclarationNode }
