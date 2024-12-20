@@ -67,4 +67,4 @@ interface DeclarationNode extends Node {
   init?: ExpressionNode;
 }
 
-export { Node, MsgNode, TypeLiteralNode, BoolLiteralNode, IntegerLiteralNode, FloatLiteralNode, StringLiteralNode, VariableNode, ExpressionNode, DeclarationNode }
+export { Node, MsgNode, TypeLiteralNode, BoolLiteralNode, IntegerLiteralNode, FloatLiteralNode, StringLiteralNode, VariableNode, ExpressionNode, DeclarationNode, BinaryOperationNode, UnaryOperationNode }

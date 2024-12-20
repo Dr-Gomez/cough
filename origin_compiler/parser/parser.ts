@@ -1,7 +1,8 @@
+import { binaryOperators } from "../lexer/detection.ts";
 import { Token, TokenType } from "../lexer/lexer.ts";
 
 import log from "../logs/log.ts";
-import { Node, BoolLiteralNode, IntegerLiteralNode, StringLiteralNode, FloatLiteralNode, MsgNode, VariableNode, TypeLiteralNode, DeclarationNode, ExpressionNode } from "./nodes.ts";
+import { Node, BoolLiteralNode, IntegerLiteralNode, StringLiteralNode, FloatLiteralNode, MsgNode, VariableNode, TypeLiteralNode, DeclarationNode, ExpressionNode, BinaryOperationNode } from "./nodes.ts";
 
 interface NodeWrapper {
   node: Node | null;
@@ -44,11 +45,11 @@ function handleType(tokens: Array<Token>, index: number): NodeWrapper {
         if (tokens[index + 2].value == "<-" || tokens[index + 2].value == "<->") {
           const expressionNode = handleNode(tokens, index + 3)
           declarationNode.init = expressionNode.node as ExpressionNode
-          index = expressionNode.index - 2
+          index = expressionNode.index
         }
       }
 
-      return {node: declarationNode, index: index + 2}
+      return {node: declarationNode, index: index}
     }
 
     return {node: typeNode, index: index + 1}
@@ -114,12 +115,26 @@ function handleBool(tokens: Array<Token>, index: number): NodeWrapper {
 
 function handleVariable(tokens: Array<Token>, index: number): NodeWrapper {
   if(tokens[index].type === TokenType.IDENTIFIER) {
-    const node: VariableNode = {
+    const variableNode: VariableNode = {
       node: "variable",
       name: tokens[index].value
     }
 
-    return {node, index: index + 1}
+    if(tokens[index + 1].type ===TokenType.BIN_OPERATOR) {
+      const nextNode: NodeWrapper = handleNode(tokens, index + 2)
+      const nextExpression = nextNode.node as ExpressionNode
+      const binaryOperationNode: BinaryOperationNode = {
+        node: "binary",
+        left: variableNode,
+        operation: tokens[index + 1].value as typeof binaryOperators[number],
+        right: nextExpression
+      }
+
+      index = nextNode.index
+      return {node: binaryOperationNode, index: index}
+    }
+
+    return {node: variableNode, index: index + 1}
   }
   return {node: null, index}
 }

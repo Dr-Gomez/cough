@@ -6,7 +6,7 @@ import log from "./logs/log.ts";
 
 const sourceCode = `
 
-int hello <-> 2
+int hello <-> num + 2
 
 `;
 
