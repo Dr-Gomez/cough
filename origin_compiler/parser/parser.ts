@@ -1,8 +1,8 @@
-import { binaryOperators } from "../lexer/detection.ts";
+import { binaryOperators, unaryOperators } from "../lexer/detection.ts";
 import { Token, TokenType } from "../lexer/lexer.ts";
 
 import log from "../logs/log.ts";
-import { Node, BoolLiteralNode, IntegerLiteralNode, StringLiteralNode, FloatLiteralNode, MsgNode, VariableNode, TypeLiteralNode, DeclarationNode, ExpressionNode, BinaryOperationNode } from "./nodes.ts";
+import { Node, BoolLiteralNode, IntegerLiteralNode, StringLiteralNode, FloatLiteralNode, MsgNode, VariableNode, TypeLiteralNode, DeclarationNode, ExpressionNode, BinaryOperationNode, UnaryOperationNode } from "./nodes.ts";
 
 interface NodeWrapper {
   node: Node | null;
@@ -120,7 +120,17 @@ function handleVariable(tokens: Array<Token>, index: number): NodeWrapper {
       name: tokens[index].value
     }
 
-    if(tokens[index + 1].type ===TokenType.BIN_OPERATOR) {
+    if(tokens[index + 1].type === TokenType.UNA_OPERATOR) {
+      const unaryExpressionNode: UnaryOperationNode = {
+        node: "unary",
+        variable: variableNode,
+        operation: tokens[index + 1].value as typeof unaryOperators[number]
+      }
+
+      return {node: unaryExpressionNode, index: index + 2}
+    }
+
+    if(tokens[index + 1].type === TokenType.BIN_OPERATOR) {
       const nextNode: NodeWrapper = handleNode(tokens, index + 2)
       const nextExpression = nextNode.node as ExpressionNode
       const binaryOperationNode: BinaryOperationNode = {
