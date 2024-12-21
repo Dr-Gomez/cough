@@ -41,7 +41,7 @@ interface VariableNode extends Node {
 
 interface UnaryOperationNode extends Node {
   node: "unary"
-  variable: VariableNode,
+  left: Node,
   operation: typeof unaryOperators[number];
 }
 
@@ -52,19 +52,14 @@ interface BinaryOperationNode extends Node {
   right: Node
 }
 
-type expressions = TypeLiteralNode | BoolLiteralNode | IntegerLiteralNode | FloatLiteralNode | StringLiteralNode | VariableNode | DeclarationNode | UnaryOperationNode | BinaryOperationNode
-
-interface ExpressionNode extends Node {
-  node: "expression",
-  expression: Array<expressions>;
-}
+type expression = TypeLiteralNode | BoolLiteralNode | IntegerLiteralNode | FloatLiteralNode | StringLiteralNode | VariableNode | DeclarationNode | UnaryOperationNode | BinaryOperationNode
 
 interface DeclarationNode extends Node {
   node: "declaration";
   type: TypeLiteralNode;
   variable: VariableNode;
   readonly?: true;
-  init?: ExpressionNode;
+  init?: expression;
 }
 
-export { Node, MsgNode, TypeLiteralNode, BoolLiteralNode, IntegerLiteralNode, FloatLiteralNode, StringLiteralNode, VariableNode, ExpressionNode, DeclarationNode, BinaryOperationNode, UnaryOperationNode }
+export { Node, MsgNode, TypeLiteralNode, BoolLiteralNode, IntegerLiteralNode, FloatLiteralNode, StringLiteralNode, VariableNode, DeclarationNode, BinaryOperationNode, UnaryOperationNode, expression }

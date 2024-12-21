@@ -232,7 +232,6 @@ function handleToken(
   index = skipWhitespace(source, index)
 
   const borrower = runQueue(instrQueue, source, index)
-
   if(borrower) {
     return borrower
   }
