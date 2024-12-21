@@ -6,7 +6,7 @@ import log from "./logs/log.ts";
 
 const sourceCode = `
 
-int hello <-> num++
+int num <- 5
 
 `;
 

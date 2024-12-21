@@ -1,20 +1,21 @@
+import { runQueue } from "../helper.ts";
 import { binaryOperators, unaryOperators } from "../lexer/detection.ts";
 import { Token, TokenType } from "../lexer/lexer.ts";
 
 import log from "../logs/log.ts";
 import { Node, BoolLiteralNode, IntegerLiteralNode, StringLiteralNode, FloatLiteralNode, MsgNode, VariableNode, TypeLiteralNode, DeclarationNode, ExpressionNode, BinaryOperationNode, UnaryOperationNode } from "./nodes.ts";
 
-interface NodeWrapper {
-  node: Node | null;
+export interface NodeWrapper {
+  payload: Node | null;
   index: number;
 }
 
 function handleEOF(tokens: Array<Token>, index: number): NodeWrapper {
   if(tokens[index].type == TokenType.EOF) {
     const node: Node = {node: "end"}
-    return {node, index}
+    return {payload: node, index}
   }
-  return {node: null, index}
+  return {payload: null, index}
 }
 
 function handleType(tokens: Array<Token>, index: number): NodeWrapper {
@@ -24,11 +25,13 @@ function handleType(tokens: Array<Token>, index: number): NodeWrapper {
       type: tokens[index].value as TypeLiteralNode["type"]
     }
 
-    if(tokens[index + 1].type == TokenType.IDENTIFIER) {
+    index++;
+
+    if(tokens[index].type == TokenType.IDENTIFIER) {
 
       const variableNode: VariableNode = {
         node: "variable",
-        name: tokens[index + 1].value
+        name: tokens[index].value
       }
 
       const declarationNode: DeclarationNode = {
@@ -37,61 +40,66 @@ function handleType(tokens: Array<Token>, index: number): NodeWrapper {
         variable: variableNode
       }
 
-      if(tokens[index + 2].type == TokenType.BIN_OPERATOR) {
-        if (tokens[index + 2].value == "<->") {
+      index++;
+
+      if(tokens[index].type == TokenType.BIN_OPERATOR) {
+        if (tokens[index].value == "<->") {
           declarationNode.readonly = true
         }
         
-        if (tokens[index + 2].value == "<-" || tokens[index + 2].value == "<->") {
-          const expressionNode = handleNode(tokens, index + 3)
-          declarationNode.init = expressionNode.node as ExpressionNode
+        if (tokens[index].value == "<-" || tokens[index].value == "<->") {
+          index++
+          const expressionNode = handleNode(tokens, index)
+          declarationNode.init = expressionNode.payload as ExpressionNode
           index = expressionNode.index
         }
       }
 
-      return {node: declarationNode, index: index}
+      return {payload: declarationNode, index: index}
     }
 
-    return {node: typeNode, index: index + 1}
+    return {payload: typeNode, index}
   }
-  return {node: null, index}
+  return {payload: null, index}
 }
 
 function handleStr(tokens: Array<Token>, index: number): NodeWrapper {
+  
   if(tokens[index].type == TokenType.STRING) {
     const node: StringLiteralNode = {
       node: "string",
       value: tokens[index].value
     }
-    return {node, index: index + 1}
+    return {payload: node, index: index + 1}
   }
-  return {node: null, index}
+  return {payload: null, index}
 }
 
 function handleFloat(tokens: Array<Token>, index: number): NodeWrapper {
   if(tokens[index].type == TokenType.REALNUM) {
     const value = Number.parseFloat(tokens[index].value)
     
-    const node: FloatLiteralNode = {
+    const floatNode: FloatLiteralNode = {
       node: "float", 
       value: value
     }
-    return {node, index: index + 1}
+    
+    return {payload: floatNode, index: index + 1}
   }
-  return {node: null, index}
+  return {payload: null, index}
 }
 
 function handleInt(tokens: Array<Token>, index: number): NodeWrapper {
   if(tokens[index].type == TokenType.INTNUM) {
     const value = Number.parseInt(tokens[index].value)
     
-    const node: IntegerLiteralNode = {
+    const intNode: IntegerLiteralNode = {
       node: "integer",
       value: value
     }
-    return {node, index: index + 1}
+    return {payload: intNode, index: index + 1}
   }
-  return {node: null, index}
+  return {payload: null, index}
 }
 
 function handleBool(tokens: Array<Token>, index: number): NodeWrapper {
@@ -108,9 +116,10 @@ function handleBool(tokens: Array<Token>, index: number): NodeWrapper {
       node: "boolean",
       value: value
     }
-    return {node, index: index + 1}
+    return {payload: node, index: index + 1}
   }
-  return {node: null, index}
+
+  return {payload: null, index}
 }
 
 function handleVariable(tokens: Array<Token>, index: number): NodeWrapper {
@@ -127,12 +136,12 @@ function handleVariable(tokens: Array<Token>, index: number): NodeWrapper {
         operation: tokens[index + 1].value as typeof unaryOperators[number]
       }
 
-      return {node: unaryExpressionNode, index: index + 2}
+      return {payload: unaryExpressionNode, index: index + 2}
     }
 
     if(tokens[index + 1].type === TokenType.BIN_OPERATOR) {
       const nextNode: NodeWrapper = handleNode(tokens, index + 2)
-      const nextExpression = nextNode.node as ExpressionNode
+      const nextExpression = nextNode.payload as ExpressionNode
       const binaryOperationNode: BinaryOperationNode = {
         node: "binary",
         left: variableNode,
@@ -141,13 +150,22 @@ function handleVariable(tokens: Array<Token>, index: number): NodeWrapper {
       }
 
       index = nextNode.index
-      return {node: binaryOperationNode, index: index}
+      return {payload: binaryOperationNode, index: index}
     }
 
-    return {node: variableNode, index: index + 1}
+    return {payload: variableNode, index: index + 1}
   }
-  return {node: null, index}
+  return {payload: null, index}
 }
+
+const primitiveInstrQueue = [
+  handleType,
+  handleStr,
+  handleFloat,
+  handleInt,
+  handleBool,
+  handleVariable
+]
 
 const instrQueue = [
   handleEOF,
@@ -159,20 +177,16 @@ const instrQueue = [
   handleVariable
 ]
 
-function checkBorrower(borrower: NodeWrapper) {
-  return borrower.node !== null
-}
-
 function handleNode(tokens: Array<Token>, index: number) {
-  for(let i = 0; i < instrQueue.length; i++) {
-    const borrower = instrQueue[i](tokens, index)
-    if(checkBorrower(borrower)) {
-      return borrower;
-    }
+  
+  const borrower = runQueue(instrQueue, tokens, index)
+
+  if(borrower) {
+    return borrower
   }
 
   const node: MsgNode = { node: "error", msg: "No pattern found matching your code"}
-  return { node, index }
+  return { payload: node, index }
 }
 
 export default function handleNodes(tokens: Array<Token>) {
@@ -181,24 +195,24 @@ export default function handleNodes(tokens: Array<Token>) {
   let index = 1;
   let nodeQueue: Array<Node> = [];
   
-  let jumpNode: NodeWrapper = { node: {node: "start"}, index: index };
-  nodeQueue.push(jumpNode.node!);
-  log.logAppend(jumpNode.node!.node, null);
+  let jumpNode: NodeWrapper = { payload: {node: "start"}, index: index };
+  nodeQueue.push(jumpNode.payload!);
+  log.logAppend(jumpNode.payload!.node, null);
 
-  while (jumpNode.node!.node !== "end") {
+  while (jumpNode.payload!.node !== "end") {
     jumpNode = handleNode(tokens, index);
 
-    if (jumpNode.node?.node == "error") {
-      log.logNodeError(`${(jumpNode.node as MsgNode).msg}`);
+    if (jumpNode.payload?.node == "error") {
+      log.logNodeError(`${(jumpNode.payload as MsgNode).msg}`);
       break;
     }
 
-    nodeQueue.push(jumpNode.node!);
+    nodeQueue.push(jumpNode.payload!);
     index = jumpNode.index;
-    log.logAppend(jumpNode.node!.node, null);
+    log.logAppend(jumpNode.payload!.node, null);
   }
 
-  if (jumpNode.node?.node !== "error") {
+  if (jumpNode.payload?.node !== "error") {
     log.logSuccess("NODE");
   }
 

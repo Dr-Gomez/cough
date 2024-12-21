@@ -2,6 +2,8 @@ import log from "../logs/log.ts";
 
 import { isAlpha, isBinaryOperator, isBool, isDigit, isKeyword, isOperatorChar, isPunctuator, isType, isUnaryOperator } from "./detection.ts";
 
+import { runQueue } from "../helper.ts";
+
 export enum TokenType {
   EOF,
   SOF,
@@ -25,16 +27,16 @@ export interface Token {
 }
 
 export interface TokenWrapper {
-  token: Token | null;
+  payload: Token | null;
   index: number;
 }
 
-function handleWhitespace(source: string, index: number): TokenWrapper {
+function skipWhitespace(source: string, index: number): number {
   while (/\s/.test(source[index])) {
     index++;
   }
 
-  return { token: null, index: index };
+  return index;
 }
 
 function handleEOF(source: string, index: number): TokenWrapper {
@@ -43,9 +45,9 @@ function handleEOF(source: string, index: number): TokenWrapper {
       type: TokenType.EOF,
       value: "",
     };
-    return { token: token, index: index };
+    return { payload: token, index: index };
   }
-  return { token: null, index: index };
+  return { payload: null, index: index };
 }
 
 function handleNamespace(source: string, index: number): TokenWrapper {
@@ -75,9 +77,9 @@ function handleNamespace(source: string, index: number): TokenWrapper {
       type: type,
       value: value,
     };
-    return { token, index };
+    return { payload: token, index };
   }
-  return { token: null, index };
+  return { payload: null, index };
 }
 
 function handleNumber(source: string, index: number): TokenWrapper {
@@ -100,17 +102,17 @@ function handleNumber(source: string, index: number): TokenWrapper {
         type: TokenType.REALNUM,
         value: value,
       };
-      return { token, index };
+      return { payload: token , index };
     } else {
       const token: Token = {
         type: TokenType.INTNUM,
         value: value,
       };
-      return { token, index };
+      return { payload: token, index };
     }
   }
 
-  return { token: null, index };
+  return { payload: null, index };
 }
 
 function handleString(source: string, index: number): TokenWrapper {
@@ -126,9 +128,9 @@ function handleString(source: string, index: number): TokenWrapper {
       value: value,
     };
     index++;
-    return { token, index };
+    return { payload: token, index };
   }
-  return { token: null, index };
+  return { payload: null, index };
 }
 
 function handleOperator(source: string, index: number): TokenWrapper {
@@ -144,7 +146,7 @@ function handleOperator(source: string, index: number): TokenWrapper {
       type: TokenType.UNA_OPERATOR,
       value: value,
     };
-    return { token, index: index };
+    return { payload: token, index: index };
   }
 
   if (isBinaryOperator(value)) {
@@ -152,10 +154,10 @@ function handleOperator(source: string, index: number): TokenWrapper {
       type: TokenType.BIN_OPERATOR,
       value: value,
     };
-    return { token, index: index };
+    return { payload: token, index: index };
   }
 
-  return { token: null, index };
+  return { payload: null, index };
 }
 
 function handlePunctuator(source: string, index: number): TokenWrapper {
@@ -166,9 +168,9 @@ function handlePunctuator(source: string, index: number): TokenWrapper {
       value: value,
     };
     index++;
-    return { token, index: index };
+    return { payload: token, index: index };
   }
-  return { token: null, index };
+  return { payload: null, index };
 }
 
 function handleComment(source: string, index: number): TokenWrapper {
@@ -186,7 +188,7 @@ function handleComment(source: string, index: number): TokenWrapper {
         type: TokenType.COMMENT,
         value: value,
       };
-      return { token, index };
+      return { payload: token, index };
     } else if (source[index + 1] === "*") {
       index += 2;
       let start = index;
@@ -203,18 +205,17 @@ function handleComment(source: string, index: number): TokenWrapper {
         value: value,
       };
       index += 2;
-      return { token, index };
+      return { payload: token, index };
     }
   }
-  return { token: null, index };
+  return { payload: null, index };
 }
 
 function checkBorrower(borrower: TokenWrapper): boolean {
-  return borrower.token !== null;
+  return borrower.payload !== null;
 }
 
 const instrQueue: Array<Function> = [
-  handleWhitespace,
   handleEOF,
   handleString,
   handleComment,
@@ -228,20 +229,16 @@ function handleToken(
   source: string,
   index: number,
 ): TokenWrapper {
-  let borrower: TokenWrapper;
+  index = skipWhitespace(source, index)
 
-  borrower = instrQueue[0](source, index);
-  index = borrower.index;
+  const borrower = runQueue(instrQueue, source, index)
 
-  for (let i = 1; i < instrQueue.length; i++) {
-    borrower = instrQueue[i](source, index);
-    if (checkBorrower(borrower)) {
-      return borrower;
-    }
+  if(borrower) {
+    return borrower
   }
 
   const errToken: TokenWrapper = {
-    token: { type: TokenType.ERROR, value: "" },
+    payload: { type: TokenType.ERROR, value: "" },
     index,
   };
 
@@ -256,29 +253,29 @@ export default function handleTokens(
   let tokenQueue: Array<Token> = [];
 
   let jumpToken: TokenWrapper = {
-    token: { type: TokenType.SOF, value: "" },
+    payload: { type: TokenType.SOF, value: "" },
     index: 0,
   };
 
-  tokenQueue.push(jumpToken.token!);
-  log.logToken(TokenType[jumpToken.token!.type], jumpToken.token!.value);
+  tokenQueue.push(jumpToken.payload!);
+  log.logToken(TokenType[jumpToken.payload!.type], jumpToken.payload!.value);
 
   let index = 0;
 
-  while (jumpToken.token?.type !== TokenType.EOF) {
+  while (jumpToken.payload?.type !== TokenType.EOF) {
     jumpToken = handleToken(source, index);
 
-    if (jumpToken.token?.type == TokenType.ERROR) {
+    if (jumpToken.payload?.type == TokenType.ERROR) {
       log.logTokenError(source, index);
       break;
     }
 
-    tokenQueue.push(jumpToken.token!);
+    tokenQueue.push(jumpToken.payload!);
     index = jumpToken.index;
-    log.logToken(TokenType[jumpToken.token!.type], jumpToken.token!.value);
+    log.logToken(TokenType[jumpToken.payload!.type], jumpToken.payload!.value);
   }
 
-  if (jumpToken.token?.type != TokenType.ERROR) {
+  if (jumpToken.payload?.type != TokenType.ERROR) {
     log.logSuccess("TOKEN");
   }
 
