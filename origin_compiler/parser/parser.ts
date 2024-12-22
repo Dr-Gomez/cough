@@ -194,14 +194,6 @@ const primitiveInstrQueue = [
 function handleNode(tokens: Array<Token>, index: number, lastNode?: Node) {
   let borrower: NodeWrapper;
 
-  if (lastNode) {
-    borrower = runQueue(supersetInstrQueue, tokens, index, lastNode)
-    if (borrower) {
-      consumeToken = true
-      return borrower
-    }
-  }
-
   borrower = runQueue(primitiveInstrQueue, tokens, index)
   if (borrower) {
     return borrower
