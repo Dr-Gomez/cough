@@ -10,10 +10,9 @@ export interface NodeWrapper {
   index: number;
 }
 
-let consumeToken = false;
 let nodeRef: Node | null;
 let usedNodeRef: boolean
-let lastParentNode: string;
+let property: string
 
 function handleEOF(tokens: Array<Token>, index: number): NodeWrapper {
   if (tokens[index].type == TokenType.EOF) {
@@ -51,7 +50,6 @@ function handleUnaOperator(tokens: Array<Token>, index: number, lastNode: Node):
       left: lastNode,
       operation: tokens[index].value  as typeof unaryOperators[number],
     }
-    consumeToken = true
     index++
 
     return { payload: unaOperatorNode, index }
@@ -250,18 +248,17 @@ export default function handleNodes(tokens: Array<Token>) {
     if (jumpNode.payload?.node == "declaration") {
       if ((jumpNode.payload as DeclarationNode).init){
         nodeRef = (jumpNode.payload as DeclarationNode).init!
-        lastParentNode = "declaration"
+        property = "init"
       }
     }
     
     if (usedNodeRef == true) {
-      switch(lastParentNode) { 
-        case "declaration":
-          (nodeQueue[nodeQueue.length - 1] as DeclarationNode).init = jumpNode.payload as expression;
-          break;
-       }
+      console.log(nodeQueue[nodeQueue.length - 1]);
+      (nodeQueue[nodeQueue.length - 1])[property] = jumpNode.payload!
+      console.log(jumpNode.payload)
     } else {
       nodeQueue.push(jumpNode.payload!);
+      console.log(jumpNode.payload)
     }
 
     index = jumpNode.index;
