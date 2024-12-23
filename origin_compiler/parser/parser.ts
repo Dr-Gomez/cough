@@ -253,12 +253,9 @@ export default function handleNodes(tokens: Array<Token>) {
     }
     
     if (usedNodeRef == true) {
-      console.log(nodeQueue[nodeQueue.length - 1]);
       (nodeQueue[nodeQueue.length - 1])[property] = jumpNode.payload!
-      console.log(jumpNode.payload)
     } else {
       nodeQueue.push(jumpNode.payload!);
-      console.log(jumpNode.payload)
     }
 
     index = jumpNode.index;
@@ -268,6 +265,8 @@ export default function handleNodes(tokens: Array<Token>) {
   if (jumpNode.payload?.node !== "error") {
     log.logSuccess("NODE");
   }
+
+  log.logAST(nodeQueue)
 
   return nodeQueue;
 }

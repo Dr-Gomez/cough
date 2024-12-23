@@ -48,6 +48,19 @@ class log {
     );
   }
 
+  public logAST(nodeArr: Array<object>) {
+    this.separateLogs();
+    this.logArr.push(
+      `${this.timer()}: STARTED GENERATING AST:`,
+    );
+    this.separateLogs();
+    nodeArr.forEach(node => this.logArr.push(`${JSON.stringify(node, null, 2)}`))
+    this.separateLogs();
+    this.logArr.push(
+      `${this.timer()}: ENDED GENERATING AST:`,
+    );
+  }
+
   public logTokenError(text: string, index: number) {
     let errPos = { line: 0, char: 0 };
 
@@ -79,6 +92,7 @@ class log {
     this.logArr.push(
       `${this.timer()}: ERROR: "${error}"`,
     );
+    this.separateLogs();
   }
 
   public logSuccess(type: string) {
