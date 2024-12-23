@@ -1,6 +1,6 @@
 import log from "../logs/log.ts";
 
-import { isAlpha, isBinaryOperator, isBool, isDigit, isKeyword, isOperatorChar, isPunctuator, isType, isUnaryOperator } from "./detection.ts";
+import { isAlpha, isBinaryOperator, isBool, isDigit, isEncapsulator, isKeyword, isOperatorChar, isPunctuator, isType, isUnaryOperator } from "./detection.ts";
 
 import { runQueue } from "../helper.ts";
 
@@ -17,6 +17,7 @@ export enum TokenType {
   BIN_OPERATOR,
   UNA_OPERATOR,
   PUNCTUATOR,
+  ENCAPSULATOR,
   COMMENT,
   ERROR,
 }
@@ -173,6 +174,19 @@ function handlePunctuator(source: string, index: number): TokenWrapper {
   return { payload: null, index };
 }
 
+function handleEncapsulator(source: string, index: number): TokenWrapper {
+  if (isEncapsulator(source[index])) {
+    const value = source[index];
+    const token: Token = {
+      type: TokenType.ENCAPSULATOR,
+      value: value,
+    };
+    index++;
+    return { payload: token, index: index };
+  }
+  return { payload: null, index };
+}
+
 function handleComment(source: string, index: number): TokenWrapper {
   if (source[index] === "/") {
     const start: number = index;
@@ -220,6 +234,7 @@ const instrQueue: Array<Function> = [
   handleString,
   handleComment,
   handlePunctuator,
+  handleEncapsulator,
   handleOperator,
   handleNumber,
   handleNamespace,

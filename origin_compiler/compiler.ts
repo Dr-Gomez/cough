@@ -6,7 +6,7 @@ import log from "./logs/log.ts";
 
 const sourceCode = `
 
-int num <- cool++ + 2 + 2 + 2 + 2
+(2+2)
 
 `;
 

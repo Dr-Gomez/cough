@@ -52,9 +52,17 @@ function isBinaryOperator(op: string): boolean {
   return binaryOperators.includes(op);
 }
 
+const punctuators = [",", ";", ":", "@"]
+
 function isPunctuator(char: string): boolean {
-  return [",", ";", ":", "(", ")", "{", "}", "[", "]", "@"].includes(char);
+  return punctuators.includes(char);
 }
 
-export { isAlpha, isBinaryOperator, isBool, isDigit, isKeyword, isOperatorChar, isPunctuator, isType, isUnaryOperator };
-export {unaryOperators, binaryOperators}
+const encapsulators = ["(", ")", "[", "]", "{", "}"]
+
+function isEncapsulator(char: string): boolean {
+  return encapsulators.includes(char);
+}
+
+export { isAlpha, isBinaryOperator, isBool, isDigit, isKeyword, isOperatorChar, isPunctuator, isType, isUnaryOperator, isEncapsulator };
+export { unaryOperators, binaryOperators, punctuators, encapsulators }
