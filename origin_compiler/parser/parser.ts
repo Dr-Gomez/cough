@@ -58,6 +58,23 @@ function handleUnaOperator(tokens: Array<Token>, index: number, lastNode: Node):
   return {payload: null, index}
 }
 
+function handleEncapsulator(tokens: Array<Token>, index: number): NodeWrapper {
+  if (tokens[index].type == TokenType.LEFT_ENCAPSULATOR) {
+    let capsuleNode: Node;
+    index++;
+    
+    while (tokens[index].type != TokenType.RIGHT_ENCAPSULATOR) {
+      const nextNodeWrapper = handleNode(tokens, index )
+      capsuleNode = nextNodeWrapper.payload!
+      index = nextNodeWrapper.index
+    }
+
+    return { payload: capsuleNode!, index}
+  }
+
+  return {payload: null, index}
+}
+
 function handleType(tokens: Array<Token>, index: number): NodeWrapper {
   if (tokens[index].type == TokenType.TYPE) {
     const typeNode: TypeLiteralNode = {
@@ -184,6 +201,7 @@ const supersetInstrQueue = [
 
 const primitiveInstrQueue = [
   handleEOF,
+  handleEncapsulator,
   handleType,
   handleStr,
   handleFloat,
