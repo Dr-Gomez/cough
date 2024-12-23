@@ -1,6 +1,6 @@
 import log from "../logs/log.ts";
 
-import { isAlpha, isBinaryOperator, isBool, isDigit, isEncapsulator, isKeyword, isOperatorChar, isPunctuator, isType, isUnaryOperator } from "./detection.ts";
+import { isAlpha, isBinaryOperator, isBool, isDigit, isLeftEncapsulator, isRightEncapsulator, isKeyword, isOperatorChar, isPunctuator, isType, isUnaryOperator, rightEncapsulators } from "./detection.ts";
 
 import { runQueue } from "../helper.ts";
 
@@ -9,15 +9,16 @@ export enum TokenType {
   SOF,
   IDENTIFIER,
   TYPE,
-  INTNUM,
-  REALNUM,
+  INT_NUM,
+  REAL_NUM,
   STRING,
   BOOL,
   KEYWORD,
   BIN_OPERATOR,
   UNA_OPERATOR,
   PUNCTUATOR,
-  ENCAPSULATOR,
+  LEFT_ENCAPSULATOR,
+  RIGHT_ENCAPSULATOR,
   COMMENT,
   ERROR,
 }
@@ -100,13 +101,13 @@ function handleNumber(source: string, index: number): TokenWrapper {
   if (value) {
     if (float) {
       const token: Token = {
-        type: TokenType.REALNUM,
+        type: TokenType.REAL_NUM,
         value: value,
       };
       return { payload: token , index };
     } else {
       const token: Token = {
-        type: TokenType.INTNUM,
+        type: TokenType.INT_NUM,
         value: value,
       };
       return { payload: token, index };
@@ -175,15 +176,26 @@ function handlePunctuator(source: string, index: number): TokenWrapper {
 }
 
 function handleEncapsulator(source: string, index: number): TokenWrapper {
-  if (isEncapsulator(source[index])) {
+  if (isLeftEncapsulator(source[index])) {
     const value = source[index];
     const token: Token = {
-      type: TokenType.ENCAPSULATOR,
+      type: TokenType.LEFT_ENCAPSULATOR,
       value: value,
     };
     index++;
     return { payload: token, index: index };
   }
+
+  if (isRightEncapsulator(source[index])) {
+    const value = source[index];
+    const token: Token = {
+      type: TokenType.RIGHT_ENCAPSULATOR,
+      value: value,
+    };
+    index++;
+    return { payload: token, index: index };
+  }
+
   return { payload: null, index };
 }
 

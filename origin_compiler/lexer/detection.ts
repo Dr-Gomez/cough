@@ -58,11 +58,16 @@ function isPunctuator(char: string): boolean {
   return punctuators.includes(char);
 }
 
-const encapsulators = ["(", ")", "[", "]", "{", "}"]
+const leftEncapsulators = ["(", "[", "{"]
+const rightEncapsulators = [")", "]", "}"]
 
-function isEncapsulator(char: string): boolean {
-  return encapsulators.includes(char);
+function isLeftEncapsulator(char: string): boolean {
+  return leftEncapsulators.includes(char);
 }
 
-export { isAlpha, isBinaryOperator, isBool, isDigit, isKeyword, isOperatorChar, isPunctuator, isType, isUnaryOperator, isEncapsulator };
-export { unaryOperators, binaryOperators, punctuators, encapsulators }
+function isRightEncapsulator(char: string): boolean {
+  return rightEncapsulators.includes(char);
+}
+
+export { isAlpha, isBinaryOperator, isBool, isDigit, isKeyword, isOperatorChar, isPunctuator, isType, isUnaryOperator, isLeftEncapsulator, isRightEncapsulator };
+export { unaryOperators, binaryOperators, punctuators, leftEncapsulators, rightEncapsulators }

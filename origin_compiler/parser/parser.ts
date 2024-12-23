@@ -116,7 +116,7 @@ function handleStr(tokens: Array<Token>, index: number): NodeWrapper {
 }
 
 function handleFloat(tokens: Array<Token>, index: number): NodeWrapper {
-  if (tokens[index].type == TokenType.REALNUM) {
+  if (tokens[index].type == TokenType.REAL_NUM) {
     const value = Number.parseFloat(tokens[index].value)
     
     const floatNode: FloatLiteralNode = {
@@ -130,7 +130,7 @@ function handleFloat(tokens: Array<Token>, index: number): NodeWrapper {
 }
 
 function handleInt(tokens: Array<Token>, index: number): NodeWrapper {
-  if (tokens[index].type == TokenType.INTNUM) {
+  if (tokens[index].type == TokenType.INT_NUM) {
     const value = Number.parseInt(tokens[index].value)
 
     const intNode: IntegerLiteralNode = {

@@ -57,7 +57,7 @@ class log {
     nodeArr.forEach(node => this.logArr.push(`${JSON.stringify(node, null, 2)}`))
     this.separateLogs();
     this.logArr.push(
-      `${this.timer()}: ENDED GENERATING AST:`,
+      `${this.timer()}: ENDED GENERATING AST`,
     );
   }
 
