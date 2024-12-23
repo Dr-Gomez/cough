@@ -9,7 +9,11 @@ export interface NodeWrapper {
   payload: Node | null;
   index: number;
 }
+
 let consumeToken = false;
+let nodeRef: Node | null;
+let usedNodeRef: boolean
+let lastParentNode: string;
 
 function handleEOF(tokens: Array<Token>, index: number): NodeWrapper {
   if (tokens[index].type == TokenType.EOF) {
@@ -194,11 +198,24 @@ const primitiveInstrQueue = [
 function handleNode(tokens: Array<Token>, index: number, lastNode?: Node) {
   let borrower: NodeWrapper;
 
+  borrower = runQueue(supersetInstrQueue, tokens, index, lastNode)
+  while(borrower) {
+    let nextBorrower = runQueue(supersetInstrQueue, tokens, borrower.index, borrower.payload)
+    if (nextBorrower) {
+      borrower = nextBorrower
+      nextBorrower = runQueue(supersetInstrQueue, tokens, borrower.index, borrower.payload)
+    } else {
+      return borrower
+    }
+  }
+
   borrower = runQueue(primitiveInstrQueue, tokens, index)
+  
   if (borrower) {
     return borrower
   }
-
+  
+  
   const node: MsgNode = { node: "error", msg: "No pattern found matching your code"}
   return { payload: node, index }
 }
@@ -214,16 +231,35 @@ export default function handleNodes(tokens: Array<Token>) {
   log.logAppend(jumpNode.payload!.node, null);
 
   while (jumpNode.payload!.node !== "end") {
-    jumpNode = handleNode(tokens, index, jumpNode.payload!);
+
+    if (nodeRef) {
+      jumpNode = handleNode(tokens, index, nodeRef);
+      nodeRef = null
+      usedNodeRef = true;
+
+    } else {
+      jumpNode = handleNode(tokens, index, jumpNode.payload!);
+      usedNodeRef = false;
+    }
 
     if (jumpNode.payload?.node == "error") {
       log.logNodeError(`${(jumpNode.payload as MsgNode).msg}`);
       break;
     }
 
-    if (consumeToken == true) {
-      consumeToken = false
-      nodeQueue[nodeQueue.length - 1] = jumpNode.payload!
+    if (jumpNode.payload?.node == "declaration") {
+      if ((jumpNode.payload as DeclarationNode).init){
+        nodeRef = (jumpNode.payload as DeclarationNode).init!
+        lastParentNode = "declaration"
+      }
+    }
+    
+    if (usedNodeRef == true) {
+      switch(lastParentNode) { 
+        case "declaration":
+          (nodeQueue[nodeQueue.length - 1] as DeclarationNode).init = jumpNode.payload as expression;
+          break;
+       }
     } else {
       nodeQueue.push(jumpNode.payload!);
     }
