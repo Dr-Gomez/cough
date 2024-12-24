@@ -62,12 +62,16 @@ function handleEncapsulator(tokens: Array<Token>, index: number): NodeWrapper {
   if (tokens[index].type == TokenType.LEFT_ENCAPSULATOR) {
     let capsuleNode: Node;
     index++;
-    
+
+    let nextNodeWrapper = handleNode(tokens, index)
+    index = nextNodeWrapper.index
+
     while (tokens[index].type != TokenType.RIGHT_ENCAPSULATOR) {
-      const nextNodeWrapper = handleNode(tokens, index )
+      nextNodeWrapper = handleNode(tokens, index, nextNodeWrapper.payload!)
       capsuleNode = nextNodeWrapper.payload!
       index = nextNodeWrapper.index
     }
+    index++
 
     return { payload: capsuleNode!, index}
   }
@@ -194,7 +198,7 @@ function handleVariable(tokens: Array<Token>, index: number): NodeWrapper {
   return {payload: null, index}
 }
 
-const supersetInstrQueue = [
+const callBackInstrQueue = [
   handleUnaOperator,
   handleBinOperator
 ]
@@ -214,12 +218,12 @@ const primitiveInstrQueue = [
 function handleNode(tokens: Array<Token>, index: number, lastNode?: Node) {
   let borrower: NodeWrapper;
 
-  borrower = runQueue(supersetInstrQueue, tokens, index, lastNode)
+  borrower = runQueue(callBackInstrQueue, tokens, index, lastNode)
   while(borrower) {
-    let nextBorrower = runQueue(supersetInstrQueue, tokens, borrower.index, borrower.payload)
+    let nextBorrower = runQueue(callBackInstrQueue, tokens, borrower.index, borrower.payload)
     if (nextBorrower) {
       borrower = nextBorrower
-      nextBorrower = runQueue(supersetInstrQueue, tokens, borrower.index, borrower.payload)
+      nextBorrower = runQueue(callBackInstrQueue, tokens, borrower.index, borrower.payload)
     } else {
       return borrower
     }
