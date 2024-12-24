@@ -276,6 +276,7 @@ export default function handleNodes(tokens: Array<Token>) {
     
     if (usedNodeRef == true) {
       (nodeQueue[nodeQueue.length - 1])[property] = jumpNode.payload!
+      log.logAppend(jumpNode.payload!.node, nodeQueue[nodeQueue.length - 1].node);
     } else {
       nodeQueue.push(jumpNode.payload!);
     }

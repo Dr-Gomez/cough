@@ -6,7 +6,7 @@ import log from "./logs/log.ts";
 
 const sourceCode = `
 
-int num <-> (1 * 2 + 3) / (4 + 3)
+int num <-> (1 * 2 + 3) / (num++ + 3)
 
 `;
 

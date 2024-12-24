@@ -40,7 +40,7 @@ class log {
   }
 
   public logAppend(childNode: string, parentNode: string | null) {
-    if (parentNode === null) {
+    if (!parentNode) {
       parentNode = "Main";
     }
     this.logArr.push(
