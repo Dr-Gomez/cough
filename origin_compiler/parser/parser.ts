@@ -61,17 +61,20 @@ function handleUnaOperator(tokens: Array<Token>, index: number, lastNode: Node):
 function handleEncapsulator(tokens: Array<Token>, index: number): NodeWrapper {
   if (tokens[index].type == TokenType.LEFT_ENCAPSULATOR) {
     let capsuleNode: Node;
-    index++;
 
-    let nextNodeWrapper = handleNode(tokens, index)
-    index = nextNodeWrapper.index
-
-    while (tokens[index].type != TokenType.RIGHT_ENCAPSULATOR) {
-      nextNodeWrapper = handleNode(tokens, index, nextNodeWrapper.payload!)
-      capsuleNode = nextNodeWrapper.payload!
+    if (tokens[index].value == "(") {
+      index++
+      let nextNodeWrapper = handleNode(tokens, index)
       index = nextNodeWrapper.index
+  
+      while (tokens[index].type != TokenType.RIGHT_ENCAPSULATOR && tokens[index].value != ")") {
+        nextNodeWrapper = handleNode(tokens, index, nextNodeWrapper.payload!)
+        capsuleNode = nextNodeWrapper.payload!
+        index = nextNodeWrapper.index
+      }
+      index++
     }
-    index++
+
 
     return { payload: capsuleNode!, index}
   }
