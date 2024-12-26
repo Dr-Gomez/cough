@@ -6,7 +6,13 @@ import log from "./logs/log.ts";
 
 const sourceCode = `
 
-int num <-> (1 * 2 + 3) / (num++ + 3)
+let x = 0;
+
+loop {
+    if (x > 10) {
+        break;
+    }
+}
 
 `;
 
