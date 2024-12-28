@@ -75,11 +75,19 @@ function handleEncapsulator(tokens: Array<Token>, index: number): NodeWrapper {
       index++
     }
 
-
     return { payload: capsuleNode!, index}
   }
 
   return {payload: null, index}
+}
+
+function handlePunctuator(tokens: Array<Token>, index: number): NodeWrapper {
+  if (tokens[index].type == TokenType.PUNCTUATOR) {
+    index++
+    const terminatorNode: Node = { node: "terminator" }
+    return { payload: terminatorNode, index }
+  }
+  return { payload: null, index}
 }
 
 function handleType(tokens: Array<Token>, index: number): NodeWrapper {
@@ -209,6 +217,7 @@ const callBackInstrQueue = [
 const primitiveInstrQueue = [
   handleEOF,
   handleEncapsulator,
+  handlePunctuator,
   handleType,
   handleStr,
   handleFloat,

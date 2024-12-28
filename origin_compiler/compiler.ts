@@ -6,14 +6,7 @@ import log from "./logs/log.ts";
 
 const sourceCode = `
 
-let x = 0;
-
-loop {
-    if (x > 10) {
-        break;
-    }
-    x++;
-}
+2 + 4; 5 - 2
 
 `;
 
