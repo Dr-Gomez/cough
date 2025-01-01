@@ -52,6 +52,11 @@ interface BinaryOperationNode extends Node {
   right: Node
 }
 
+interface CodeBlockNode extends Node {
+  node: "block",
+  nodes: Array<Node>
+}
+
 type expression = TypeLiteralNode | BoolLiteralNode | IntegerLiteralNode | FloatLiteralNode | StringLiteralNode | VariableNode | DeclarationNode | UnaryOperationNode | BinaryOperationNode
 
 interface DeclarationNode extends Node {
@@ -62,4 +67,4 @@ interface DeclarationNode extends Node {
   init?: expression;
 }
 
-export { Node, MsgNode, TypeLiteralNode, BoolLiteralNode, IntegerLiteralNode, FloatLiteralNode, StringLiteralNode, VariableNode, DeclarationNode, BinaryOperationNode, UnaryOperationNode, expression }
+export { Node, MsgNode, TypeLiteralNode, BoolLiteralNode, IntegerLiteralNode, FloatLiteralNode, StringLiteralNode, VariableNode, DeclarationNode, BinaryOperationNode, UnaryOperationNode, CodeBlockNode, expression }

@@ -3,7 +3,7 @@ import { binaryOperators, unaryOperators } from "../lexer/detection.ts";
 import { Token, TokenType } from "../lexer/lexer.ts";
 
 import log from "../logs/log.ts";
-import { Node, BoolLiteralNode, IntegerLiteralNode, StringLiteralNode, FloatLiteralNode, MsgNode, VariableNode, TypeLiteralNode, DeclarationNode, BinaryOperationNode, UnaryOperationNode, expression } from "./nodes.ts";
+import { Node, BoolLiteralNode, IntegerLiteralNode, StringLiteralNode, FloatLiteralNode, MsgNode, VariableNode, TypeLiteralNode, DeclarationNode, BinaryOperationNode, UnaryOperationNode, expression, CodeBlockNode } from "./nodes.ts";
 
 export interface NodeWrapper {
   payload: Node | null;
@@ -72,6 +72,18 @@ function handleEncapsulator(tokens: Array<Token>, index: number): NodeWrapper {
         capsuleNode = nextNodeWrapper.payload!
         index = nextNodeWrapper.index
       }
+      index++
+    }
+
+    if (tokens[index].value == "{") {
+      index++
+      const startIndex = index
+      console.log(tokens[startIndex])
+      while (tokens[index].type != TokenType.RIGHT_ENCAPSULATOR && tokens[index].value != "}") {
+        index++;
+      }
+      const blockNode: CodeBlockNode = { node: "block", nodes: handleNodes(tokens.slice(startIndex, index))}
+      capsuleNode = blockNode;
       index++
     }
 
@@ -255,9 +267,13 @@ function handleNode(tokens: Array<Token>, index: number, lastNode?: Node) {
 export default function handleNodes(tokens: Array<Token>) {
   log.startLog("NODE");
   
-  let index = 1;
+  let index = 0;
   let nodeQueue: Array<Node> = [];
   
+  if (tokens[index].type == TokenType.SOF) {
+    index++
+  }
+
   let jumpNode: NodeWrapper = { payload: {node: "start"}, index: index };
   nodeQueue.push(jumpNode.payload!);
   log.logAppend(jumpNode.payload!.node, null);
