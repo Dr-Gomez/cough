@@ -5,7 +5,10 @@ import { Token } from "./lexer/lexer.ts";
 import log from "./logs/log.ts";
 
 const sourceCode = `
-22 + 45
+true
+22
+"string"
+23.0
 `;
 
 let TokenQueue: Array<Token> = handleTokens(sourceCode);
