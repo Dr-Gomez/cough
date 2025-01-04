@@ -1,11 +1,22 @@
 import { runQueue } from "../helper.ts";
 import { Token, TokenType } from "../lexer/lexer.ts";
 import log from "../logs/log.ts";
-import { BoolLiteralNode, FloatLiteralNode, IntegerLiteralNode, Node, StringLiteralNode } from "./nodes.ts";
+import { BoolLiteralNode, FloatLiteralNode, IntegerLiteralNode, Node, StringLiteralNode, VariableNode } from "./nodes.ts";
 
 export interface NodeWrapper {
   payload: Node | null;
   index: number;
+}
+
+function handleNamespace(tokens: Array<Token>, tokenIndex: number): NodeWrapper {
+  if (tokens[tokenIndex].type == TokenType.IDENTIFIER) {
+    const value = tokens[tokenIndex].value
+    tokenIndex++;
+    const varNode: VariableNode = { node: "variable", name: value }
+    return { payload: varNode, index: tokenIndex }
+  }
+
+  return { payload: null, index: tokenIndex }
 }
 
 function handleStrLiteral(tokens: Array<Token>, tokenIndex: number): NodeWrapper {
@@ -60,6 +71,7 @@ function handleBoolLiteral(tokens: Array<Token>, tokenIndex: number): NodeWrappe
 }
 
 const instrQueue = [
+  handleNamespace,
   handleBoolLiteral,
   handleIntLiteral,
   handleFloatLiteral,
@@ -71,6 +83,8 @@ function handleNode(tokens: Array<Token>, tokenIndex: number) {
   if (borrower) {
     return borrower
   }
+
+  return { payload: {node: "error", msg: "Pattern not found on code"}, index: tokenIndex }
 }
 
 export function handleNodes(tokens: Array<Token>) {
