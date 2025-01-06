@@ -5,7 +5,7 @@ import { Token } from "./lexer/lexer.ts";
 import log from "./logs/log.ts";
 
 const sourceCode = `
-variable
+int num
 `;
 
 let TokenQueue: Array<Token> = handleTokens(sourceCode);

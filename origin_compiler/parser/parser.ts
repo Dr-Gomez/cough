@@ -1,11 +1,34 @@
 import { runQueue } from "../helper.ts";
 import { Token, TokenType } from "../lexer/lexer.ts";
 import log from "../logs/log.ts";
-import { BoolLiteralNode, FloatLiteralNode, IntegerLiteralNode, Node, StringLiteralNode, VariableNode } from "./nodes.ts";
+import { BoolLiteralNode, DeclarationNode, FloatLiteralNode, IntegerLiteralNode, Node, StringLiteralNode, TypeLiteralNode, VariableNode } from "./nodes.ts";
 
 export interface NodeWrapper {
   payload: Node | null;
   index: number;
+}
+
+function handleType(tokens: Array<Token>, tokenIndex: number): NodeWrapper {
+  if (tokens[tokenIndex].type == TokenType.TYPE) {
+    let value = tokens[tokenIndex].value
+    tokenIndex++;
+    const typeNode: TypeLiteralNode = { node: "type", type: value as "bool" | "int" | "float" | "str" }
+    if (tokens[tokenIndex].type == TokenType.IDENTIFIER) {
+      value = tokens[tokenIndex].value
+      tokenIndex++;
+      const variableNode: VariableNode = { node: "variable", name: value }
+      const declarationNode: DeclarationNode = { node: "declaration", type: typeNode, variable: variableNode }
+
+      if (tokens[tokenIndex].type == TokenType.BIN_OPERATOR && tokens[tokenIndex].value == "<->") {
+        declarationNode.readonly = true
+      }
+
+      return { payload: declarationNode, index: tokenIndex }
+    }
+    return { payload: typeNode, index: tokenIndex }
+  }
+
+  return { payload: null, index: tokenIndex }
 }
 
 function handleNamespace(tokens: Array<Token>, tokenIndex: number): NodeWrapper {
@@ -71,6 +94,7 @@ function handleBoolLiteral(tokens: Array<Token>, tokenIndex: number): NodeWrappe
 }
 
 const instrQueue = [
+  handleType,
   handleNamespace,
   handleBoolLiteral,
   handleIntLiteral,
@@ -98,8 +122,8 @@ export function handleNodes(tokens: Array<Token>) {
 
   while(tokens[tokenIndex].type != TokenType.EOF) {
     jumpNode = handleNode(tokens, tokenIndex);
+    tokenIndex = jumpNode.index
     nodeArr.push(jumpNode.payload!)
-    tokenIndex++;
   }
 
   return nodeArr
