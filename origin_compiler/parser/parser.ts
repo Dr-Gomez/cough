@@ -1,7 +1,7 @@
 import { runQueue } from "../helper.ts";
 import { Token, TokenType } from "../lexer/lexer.ts";
 import log from "../logs/log.ts";
-import { BoolLiteralNode, DeclarationNode, FloatLiteralNode, IntegerLiteralNode, Node, StringLiteralNode, TypeLiteralNode, VariableNode } from "./nodes.ts";
+import { BoolLiteralNode, DeclarationNode, expression, FloatLiteralNode, IntegerLiteralNode, Node, StringLiteralNode, TypeLiteralNode, VariableNode } from "./nodes.ts";
 
 export interface NodeWrapper {
   payload: Node | null;
@@ -19,12 +19,24 @@ function handleType(tokens: Array<Token>, tokenIndex: number): NodeWrapper {
       const variableNode: VariableNode = { node: "variable", name: value }
       const declarationNode: DeclarationNode = { node: "declaration", type: typeNode, variable: variableNode }
 
-      if (tokens[tokenIndex].type == TokenType.BIN_OPERATOR && tokens[tokenIndex].value == "<->") {
-        declarationNode.readonly = true
+      if (tokens[tokenIndex].type == TokenType.BIN_OPERATOR) {
+        if (tokens[tokenIndex].value == "<->") {
+          declarationNode.readonly = true
+          tokens[tokenIndex].value = "<-"
+        }
+
+        if (tokens[tokenIndex].value == "<-") {
+          tokenIndex++
+          const rightExpression: NodeWrapper = handleNode(tokens, tokenIndex)
+          declarationNode.init = rightExpression.payload as expression
+          tokenIndex = rightExpression.index
+        }
+
       }
 
       return { payload: declarationNode, index: tokenIndex }
     }
+
     return { payload: typeNode, index: tokenIndex }
   }
 
