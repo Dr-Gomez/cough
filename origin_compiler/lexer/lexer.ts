@@ -20,6 +20,7 @@ export enum TokenType {
   LEFT_ENCAPSULATOR,
   RIGHT_ENCAPSULATOR,
   COMMENT,
+  TERMINATOR,
   ERROR,
 }
 
