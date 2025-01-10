@@ -8,6 +8,17 @@ export interface NodeWrapper {
   index: number;
 }
 
+function handleTerminator(tokens: Array<Token>, tokenIndex: number): NodeWrapper {
+  if (tokens[tokenIndex].type == TokenType.PUNCTUATOR) {
+    if (tokens[tokenIndex].value == ";") {
+      tokenIndex++;
+      console.log("trigerred")
+      return { payload: { node: "terminator" }, index: tokenIndex }
+    }
+  }
+  return { payload: null, index: tokenIndex }
+}
+
 function handleType(tokens: Array<Token>, tokenIndex: number): NodeWrapper {
   if (tokens[tokenIndex].type == TokenType.TYPE) {
     let value = tokens[tokenIndex].value
@@ -111,10 +122,12 @@ const instrQueue = [
   handleBoolLiteral,
   handleIntLiteral,
   handleFloatLiteral,
-  handleStrLiteral
+  handleStrLiteral,
+  handleTerminator,
 ]
 
 function handleNode(tokens: Array<Token>, tokenIndex: number) {
+  console.log(tokens[tokenIndex], tokenIndex)
   const borrower = runQueue(instrQueue, tokens, tokenIndex)
   if (borrower) {
     return borrower
