@@ -1,6 +1,6 @@
 import log from "../logs/log.ts";
 
-import { isAlpha, isBinaryOperator, isBool, isDigit, isLeftEncapsulator, isRightEncapsulator, isKeyword, isOperatorChar, isPunctuator, isType, isUnaryOperator, rightEncapsulators } from "./detection.ts";
+import { isAlpha, isBinaryOperator, isBool, isDigit, isLeftEncapsulator, isRightEncapsulator, isKeyword, isOperatorChar, isPunctuator, isType, isUnaryOperator, rightEncapsulators, isAssignmentOperators } from "./detection.ts";
 
 import { runQueue } from "../helper.ts";
 
@@ -14,6 +14,7 @@ export enum TokenType {
   STRING,
   BOOL,
   KEYWORD,
+  ASSIGN_OPERATOR,
   BIN_OPERATOR,
   UNA_OPERATOR,
   PUNCTUATOR,
@@ -143,6 +144,14 @@ function handleOperator(source: string, index: number): TokenWrapper {
 
   const value = source.slice(start, index);
 
+  if (isAssignmentOperators(value)) {
+    const token: Token = {
+      type: TokenType.ASSIGN_OPERATOR,
+      value: value
+    }
+    return { payload: token, index: index }
+  }
+
   if (isUnaryOperator(value)) {
     const token: Token = {
       type: TokenType.UNA_OPERATOR,
@@ -235,10 +244,6 @@ function handleComment(source: string, index: number): TokenWrapper {
     }
   }
   return { payload: null, index };
-}
-
-function checkBorrower(borrower: TokenWrapper): boolean {
-  return borrower.payload !== null;
 }
 
 const instrQueue: Array<Function> = [

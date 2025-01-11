@@ -36,6 +36,15 @@ function isUnaryOperator(op: string): boolean {
   return unaryOperators.includes(op);
 }
 
+const assignmentOperators: string[] = [
+  "<-",
+  "<->"
+]
+
+function isAssignmentOperators(op: string): boolean {
+  return assignmentOperators.includes(op)
+}
+
 const binaryOperators: string[] = [
   "+",
   "-",
@@ -44,8 +53,6 @@ const binaryOperators: string[] = [
   "=",
   "<",
   ">",
-  "<->",
-  "<-"
 ];
 
 function isBinaryOperator(op: string): boolean {
@@ -69,5 +76,5 @@ function isRightEncapsulator(char: string): boolean {
   return rightEncapsulators.includes(char);
 }
 
-export { isAlpha, isBinaryOperator, isBool, isDigit, isKeyword, isOperatorChar, isPunctuator, isType, isUnaryOperator, isLeftEncapsulator, isRightEncapsulator };
+export { isAlpha, isAssignmentOperators, isBinaryOperator, isBool, isDigit, isKeyword, isOperatorChar, isPunctuator, isType, isUnaryOperator, isLeftEncapsulator, isRightEncapsulator };
 export { unaryOperators, binaryOperators, punctuators, leftEncapsulators, rightEncapsulators }

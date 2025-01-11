@@ -1,7 +1,7 @@
 import { runQueue } from "../helper.ts";
 import { Token, TokenType } from "../lexer/lexer.ts";
 import log from "../logs/log.ts";
-import { BoolLiteralNode, DeclarationNode, expression, FloatLiteralNode, IntegerLiteralNode, Node, StringLiteralNode, TypeLiteralNode, VariableNode } from "./nodes.ts";
+import { BoolLiteralNode, DeclarationNode, FloatLiteralNode, IntegerLiteralNode, Node, StringLiteralNode, TypeLiteralNode, VariableNode } from "./nodes.ts";
 
 export interface NodeWrapper {
   payload: Node | null;
@@ -12,7 +12,6 @@ function handleTerminator(tokens: Array<Token>, tokenIndex: number): NodeWrapper
   if (tokens[tokenIndex].type == TokenType.PUNCTUATOR) {
     if (tokens[tokenIndex].value == ";") {
       tokenIndex++;
-      console.log("trigerred")
       return { payload: { node: "terminator" }, index: tokenIndex }
     }
   }
@@ -39,7 +38,7 @@ function handleType(tokens: Array<Token>, tokenIndex: number): NodeWrapper {
         if (tokens[tokenIndex].value == "<-") {
           tokenIndex++
           const rightExpression: NodeWrapper = handleNode(tokens, tokenIndex)
-          declarationNode.init = rightExpression.payload as expression
+          declarationNode.init = rightExpression.payload as Node
           tokenIndex = rightExpression.index
         }
 
@@ -127,7 +126,6 @@ const instrQueue = [
 ]
 
 function handleNode(tokens: Array<Token>, tokenIndex: number) {
-  console.log(tokens[tokenIndex], tokenIndex)
   const borrower = runQueue(instrQueue, tokens, tokenIndex)
   if (borrower) {
     return borrower
