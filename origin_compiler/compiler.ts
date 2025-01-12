@@ -5,12 +5,7 @@ import { Token } from "./lexer/lexer.ts";
 import log from "./logs/log.ts";
 
 const sourceCode = `
-// Start of program
-
-int num <-> 5.0;
-float num <-> 5.0;
-
-// End of program
+52 + 6 * 5 + 2
 `;
 
 const TokenQueue: Array<Token> = handleTokens(sourceCode);
