@@ -11,7 +11,8 @@ import {
   StringLiteralNode, 
   TypeLiteralNode, 
   VariableNode, 
-  BinaryOperationNode, 
+  BinaryOperationNode,
+  UnaryOperationNode, 
 } from "./nodes.ts";
 
 export interface NodeWrapper {
@@ -123,6 +124,25 @@ function handleBoolLiteral(tokens: Array<Token>, tokenIndex: number): NodeWrappe
   return { payload: null, index: tokenIndex };
 }
 
+function hanleUnaryOperation(tokens: Array<Token>, tokenIndex: number): NodeWrapper {
+  if (tokens[tokenIndex].type === TokenType.UNA_OPERATOR) {
+    const operator = tokens[tokenIndex].value;
+    tokenIndex++
+
+    const unaryOperationNode: UnaryOperationNode = {
+      node: "unary",
+      operation: operator,
+      left: nodeArr[nodeArr.length - 1],
+    }
+
+    nodeArr.pop()
+
+    return { payload: unaryOperationNode, index: tokenIndex }
+  }
+
+  return { payload: null, index: tokenIndex }
+}
+
 function handleBinaryOperation(tokens: Array<Token>, tokenIndex: number): NodeWrapper {
   if (tokens[tokenIndex].type === TokenType.BIN_OPERATOR) {
     const operator = tokens[tokenIndex].value;
@@ -156,6 +176,7 @@ const instrQueue = [
   handleStrLiteral,
   handleTerminator,
   handleBinaryOperation,
+  hanleUnaryOperation
 ];
 
 function handleNode(tokens: Array<Token>, tokenIndex: number): NodeWrapper {
