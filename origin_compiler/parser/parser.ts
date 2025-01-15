@@ -12,7 +12,8 @@ import {
   TypeLiteralNode, 
   VariableNode, 
   BinaryOperationNode,
-  UnaryOperationNode, 
+  UnaryOperationNode,
+  CodeBlockNode, 
 } from "./nodes.ts";
 
 export interface NodeWrapper {
@@ -20,7 +21,7 @@ export interface NodeWrapper {
   index: number;
 }
 
-const nodeArr: Array<Node> = [];
+let nodeArr: Array<Node> = [];
 
 function handleTerminator(tokens: Array<Token>, tokenIndex: number): NodeWrapper {
   if (tokens[tokenIndex].type === TokenType.PUNCTUATOR && tokens[tokenIndex].value === ";") {
@@ -192,6 +193,8 @@ function handleNode(tokens: Array<Token>, tokenIndex: number): NodeWrapper {
 }
 
 export function handleNodes(tokens: Array<Token>) {
+  const context = nodeArr
+  nodeArr = []
   let tokenIndex = 0;
 
   if (tokens[tokenIndex].type === TokenType.SOF) {
@@ -204,7 +207,9 @@ export function handleNodes(tokens: Array<Token>) {
     nodeArr.push(nodeWrapper.payload!);
   }
 
-  return nodeArr;
+  const codeblock: CodeBlockNode = { node: "block", nodes: nodeArr}
+  context.push(codeblock)
+  return context;
 }
 
 export default function handleProgram(tokens: Array<Token>) {
