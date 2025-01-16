@@ -209,6 +209,7 @@ export function handleNodes(tokens: Array<Token>) {
 
   const codeblock: CodeBlockNode = { node: "block", nodes: nodeArr}
   context.push(codeblock)
+  nodeArr = context
   return context;
 }
 
