@@ -65,4 +65,11 @@ interface DeclarationNode extends Node {
   init?: Node;
 }
 
-export { Node, MsgNode, TypeLiteralNode, BoolLiteralNode, IntegerLiteralNode, FloatLiteralNode, StringLiteralNode, VariableNode, DeclarationNode, BinaryOperationNode, UnaryOperationNode, CodeBlockNode }
+interface IfNode extends Node {
+  node: "if";
+  condition: Node,
+  trueBlock: CodeBlockNode;
+  falseBlock: CodeBlockNode;
+}
+
+export { Node, MsgNode, TypeLiteralNode, BoolLiteralNode, IntegerLiteralNode, FloatLiteralNode, StringLiteralNode, VariableNode, DeclarationNode, BinaryOperationNode, UnaryOperationNode, CodeBlockNode, IfNode }
