@@ -1,4 +1,4 @@
-const keywords: string[] = ["if", "else", "loop", "break", "fn", "return"];
+const keywords: string[] = ["if", "else", "loop", "break", "fn", "return", "sage"];
 
 function isKeyword(word: string): boolean {
   return keywords.includes(word);

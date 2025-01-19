@@ -23,6 +23,67 @@ export interface NodeWrapper {
 
 let nodeArr: Array<Node> = [];
 
+function handleEncapsulator(tokens: Array<Token>, tokenIndex: number): NodeWrapper {
+  function matchEncapsulator(encapsulator: string) {
+    if (encapsulator === "{") {
+      return "}";
+    }
+  
+    else if (encapsulator === "[") {
+      return "]";
+    }
+  
+    else if (encapsulator === "(") {
+      return ")";
+    }
+  }
+  
+  if (tokens[tokenIndex].type === TokenType.LEFT_ENCAPSULATOR) {
+    const leftEncapsulator = tokens[tokenIndex].value;
+    const rightEncapsulator = matchEncapsulator(leftEncapsulator);
+    
+    tokenIndex++;
+    
+    const startIndex = tokenIndex;
+
+    let count = 1
+
+    while (count !== 0 ) {
+      tokenIndex++
+      if (tokens[tokenIndex].type === TokenType.LEFT_ENCAPSULATOR && tokens[tokenIndex].value === leftEncapsulator) {
+        count++;
+      }
+      if (tokens[tokenIndex].type === TokenType.RIGHT_ENCAPSULATOR && tokens[tokenIndex].value === rightEncapsulator) {
+        count--;
+      }
+    }
+    const nodes = handleNodes(tokens.slice(startIndex, tokenIndex))
+    tokenIndex++
+    const codeBlockNode: CodeBlockNode = { node: "block", nodes: nodes}
+    return { payload: codeBlockNode, index: tokenIndex}
+  }
+
+  return { payload: null, index: tokenIndex }
+}
+
+function handleKeyword(tokens: Array<Token>, tokenIndex: number): NodeWrapper {
+  if (tokens[tokenIndex].type === TokenType.KEYWORD) {
+    if (tokens[tokenIndex].value === "if") {
+      tokenIndex++;
+      const conditions = handleEncapsulator(tokens, tokenIndex)
+      tokenIndex = conditions.index
+      const block = handleEncapsulator(tokens, tokenIndex)
+      tokenIndex = block.index
+
+      while(tokens[tokenIndex].type === "else") {
+        const block = handleEncapsulator(tokens, tokenIndex)
+        tokenIndex = block.index
+      }
+    }
+  }
+  return { payload: null, index: tokenIndex }
+}
+
 function handleTerminator(tokens: Array<Token>, tokenIndex: number): NodeWrapper {
   if (tokens[tokenIndex].type === TokenType.PUNCTUATOR && tokens[tokenIndex].value === ";") {
     tokenIndex++;
@@ -169,6 +230,7 @@ function handleBinaryOperation(tokens: Array<Token>, tokenIndex: number): NodeWr
 }
 
 const instrQueue = [
+  handleEncapsulator,
   handleType,
   handleNamespace,
   handleBoolLiteral,
@@ -201,15 +263,22 @@ export function handleNodes(tokens: Array<Token>) {
     tokenIndex++;
   }
 
-  while (tokens[tokenIndex].type !== TokenType.EOF) {
+  while (tokenIndex < tokens.length) {
+    if (tokens[tokenIndex].type === TokenType.EOF) {
+      break;
+    }
     const nodeWrapper = handleNode(tokens, tokenIndex);
     tokenIndex = nodeWrapper.index;
     nodeArr.push(nodeWrapper.payload!);
   }
 
-  const codeblock: CodeBlockNode = { node: "block", nodes: nodeArr}
-  context.push(codeblock)
-  nodeArr = context
+  if(nodeArr.length === 1) {
+    context.push(nodeArr[0])
+  } else {
+    const codeblock: CodeBlockNode = { node: "block", nodes: nodeArr}
+    context.push(codeblock)
+    nodeArr = context
+  }
   return context;
 }
 
