@@ -67,7 +67,6 @@ function isOperator(char: string) {
   return operators.includes(char);
 }
 
-const whitespaces: Array<string> = [" ", "\n", "\r"];
 function isWhitespace(char: string) {
   switch (char) {
     case " ":
@@ -96,7 +95,9 @@ function isRightEncapsulator(char: string) {
     case "}":
       return true;
     case "]":
-      return;
+      return true;
+    case ")":
+      return true;
   }
 }
 
@@ -342,12 +343,8 @@ function isComparisonOperator(operator: string) {
 
 export {
   isAdditiveOperator,
-  isSubtractiveOperator,
-  isProductOperator,
-  isQuotientOperator,
   isAlpha,
   isAssignmentOperator,
-  isSwapOperator,
   isBinaryLogicalKeyword,
   isBinaryLogicalOperator,
   isBitshiftOperator,
@@ -360,11 +357,15 @@ export {
   isIoKeyword,
   isLeftEncapsulator,
   isOperator,
+  isProductOperator,
+  isQuotientOperator,
   isRightEncapsulator,
   isSelectionKeyword,
   isSeparator,
   isSequencingKeyword,
   isString,
+  isSubtractiveOperator,
+  isSwapOperator,
   isType,
   isUnaryLogicalKeyword,
   isUnaryLogicalOperator,

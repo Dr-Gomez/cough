@@ -1,6 +1,8 @@
 import {
+  isAdditiveOperator,
   isAlpha,
   isAssignmentOperator,
+  isBinaryLogicalKeyword,
   isBinaryLogicalOperator,
   isBitshiftOperator,
   isBoolKeyword,
@@ -12,21 +14,19 @@ import {
   isIoKeyword,
   isLeftEncapsulator,
   isOperator,
+  isProductOperator,
+  isQuotientOperator,
   isRightEncapsulator,
   isSelectionKeyword,
   isSeparator,
   isSequencingKeyword,
   isString,
+  isSubtractiveOperator,
+  isSwapOperator,
   isType,
   isUnaryLogicalKeyword,
-  isBinaryLogicalKeyword,
   isUnaryLogicalOperator,
   isWhitespace,
-  isSwapOperator,
-  isAdditiveOperator,
-  isSubtractiveOperator,
-  isProductOperator,
-  isQuotientOperator,
 } from "./detection.ts";
 import {
   Affix,
@@ -44,6 +44,11 @@ import {
 
 interface TokenWrapper {
   token: Token;
+  index: number;
+}
+
+interface TokenStackWrapper {
+  tokens: Array<Token>;
   index: number;
 }
 
@@ -72,6 +77,7 @@ function handleWords(input: string, index: number): TokenWrapper {
       arity: Arity.BINARY,
       affix: Affix.INFIX,
       associativity: 1,
+      commutative: true,
     } as BinaryOperatorToken;
   } else if (isUnaryLogicalKeyword(word)) {
     outToken = {
@@ -236,12 +242,13 @@ function handleNumbers(input: string, index: number): TokenWrapper {
       case "x":
         base = NumberBase.HEX;
         break;
-      default:
-        let outToken: Token = {
-          value: "Number base not recognized",
+      default: {
+        const outToken: Token = {
+          value: "ERROR: Number base not recognized",
           type: TokenType.ERROR,
         };
         return { token: outToken, index: index };
+      }
     }
     startIndex += 2;
     index++;
@@ -257,10 +264,12 @@ function handleNumbers(input: string, index: number): TokenWrapper {
       index++;
       continue;
     } else if (input[index] === ".") {
-      let outToken: Token = {
-        value: "Can't have more than one radix point per number",
+      const outToken: Token = {
+        value: "ERROR: Can't have more than one radix point per number",
         type: TokenType.ERROR,
       };
+
+      return { token: outToken, index: index };
     }
 
     if (!isDigit(input[index])) {
@@ -273,7 +282,7 @@ function handleNumbers(input: string, index: number): TokenWrapper {
   const number: string = input.substring(startIndex, index);
   index--;
 
-  let outToken: NumberToken = { value: number, base: base!, type: type };
+  const outToken: NumberToken = { value: number, base: base!, type: type };
   return { token: outToken, index: index };
 }
 
@@ -320,8 +329,7 @@ function handleEncapsulator(
   index: number,
   type: TokenType.LEFT_ENCAPSULATOR | TokenType.RIGHT_ENCAPSULATOR
 ) {
-  let outToken: Token | undefined;
-  outToken = { value: input[index], type: type };
+  const outToken = { value: input[index], type: type };
 
   return { token: outToken, index: index };
 }
@@ -335,9 +343,7 @@ function skipSpace(input: string, index: number) {
 }
 
 function handleSeparator(input: string, index: number): TokenWrapper {
-  let outToken: Token | undefined;
-
-  outToken = { value: input[index], type: TokenType.SEPARATOR };
+  const outToken = { value: input[index], type: TokenType.SEPARATOR };
   return { token: outToken, index: index };
 }
 
@@ -385,7 +391,6 @@ function handleError(input: string, index: number): TokenWrapper {
 
     return false;
   }
-  let outToken: Token | undefined;
 
   const startIndex = index;
   index++;
@@ -395,20 +400,59 @@ function handleError(input: string, index: number): TokenWrapper {
   }
 
   const error = input.substring(startIndex, index);
-  outToken = { value: error, type: TokenType.ERROR };
+  const outToken = { value: error, type: TokenType.ERROR };
   index--;
 
   return { token: outToken, index: index };
 }
 
-export function tokenize(input: string): Array<Token> {
+export function tokenize(
+  input: string,
+  returnIndex: boolean = false,
+  breakChar: string = "",
+  index: number = 0
+): Array<Token> | { tokens: Array<Token>; index: number } {
   const tokensOut: Array<Token> = [];
 
-  let index = skipSpace(input, 0);
-  let jumpToken: TokenWrapper;
+  let jumpToken: TokenWrapper = { token: { value: "", type: TokenType.length }, index: index };
 
-  while (index < input.length) {
-    if (isAlpha(input[index])) {
+  while (jumpToken.token.type !== TokenType.ERROR) {
+    index = skipSpace(input, index);
+    if (index >= input.length) {
+      if (breakChar != "") {
+        tokensOut.push({ value: "ERROR: Unmached encapsulator", type: TokenType.ERROR });
+      }
+
+      break;
+    }
+
+    if (input[index] == breakChar) {
+      break;
+    } else if (isRightEncapsulator(input[index])) {
+      jumpToken = { token: { value: "ERROR: Unmached encapsulator", type: TokenType.ERROR }, index: index };
+      break;
+    } else if (isLeftEncapsulator(input[index])) {
+      let breakChar: "}" | "]" | ")";
+
+      switch (input[index]) {
+        case "{":
+          breakChar = "}";
+          break;
+        case "[":
+          breakChar = "]";
+          break;
+        case "(":
+          breakChar = ")";
+          break;
+      }
+
+      const jumpTokenStack: TokenStackWrapper = tokenize(input, true, breakChar!, ++index) as TokenStackWrapper;
+      index = ++jumpTokenStack.index;
+      while (jumpTokenStack.tokens.length > 0) {
+        tokensOut.push(jumpTokenStack.tokens.pop()!);
+      }
+      continue;
+    } else if (isAlpha(input[index])) {
       jumpToken = handleWords(input, index);
     } else if (isOperator(input[index])) {
       jumpToken = handleOperator(input, index);
@@ -416,10 +460,6 @@ export function tokenize(input: string): Array<Token> {
       jumpToken = handleNumbers(input, index);
     } else if (isString(input[index])) {
       jumpToken = handleStrings(input, index);
-    } else if (isLeftEncapsulator(input[index])) {
-      jumpToken = handleEncapsulator(input, index, TokenType.LEFT_ENCAPSULATOR);
-    } else if (isRightEncapsulator(input[index])) {
-      jumpToken = handleEncapsulator(input, index, TokenType.RIGHT_ENCAPSULATOR);
     } else if (isSeparator(input[index])) {
       jumpToken = handleSeparator(input, index);
     } else if (isComment(input[index])) {
@@ -430,8 +470,10 @@ export function tokenize(input: string): Array<Token> {
 
     index = ++jumpToken.index;
     tokensOut.push(jumpToken.token);
+  }
 
-    index = skipSpace(input, index);
+  if (returnIndex == true) {
+    return { tokens: tokensOut, index: index };
   }
 
   return tokensOut;

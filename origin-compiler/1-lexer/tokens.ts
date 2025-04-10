@@ -62,8 +62,8 @@ export enum Affix {
 }
 
 export enum Arity {
-  UNARY,
   BINARY,
+  UNARY,
 }
 
 interface OperatorToken extends Token {
@@ -74,7 +74,10 @@ interface OperatorToken extends Token {
   associativity: number;
 }
 
-type UnaryTypes = TokenType.LOGICAL_KEYWORD | TokenType.BIT_OPERATOR | TokenType.COUNT_OPERATOR;
+type UnaryTypes =
+  | TokenType.LOGICAL_KEYWORD
+  | TokenType.BIT_OPERATOR
+  | TokenType.COUNT_OPERATOR;
 
 interface UnaryOperatorToken extends OperatorToken {
   value: string;
